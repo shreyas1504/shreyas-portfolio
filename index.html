@@ -2444,20 +2444,31 @@
   (() => {
     const landing = document.getElementById('portfolio-landing');
     if (!landing) return;
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+    const resetToHomepage = () => {
+      history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+    };
 
     const enterPortfolio = (event) => {
       if (landing.classList.contains('is-exiting')) return;
+      event.preventDefault();
+      event.stopPropagation();
 
       const x = event.clientX || window.innerWidth / 2;
       const y = event.clientY || window.innerHeight / 2;
       landing.style.setProperty('--entry-x', `${x}px`);
       landing.style.setProperty('--entry-y', `${y}px`);
+      resetToHomepage();
       landing.classList.add('is-exiting');
 
       window.setTimeout(() => {
         landing.hidden = true;
         document.body.classList.remove('landing-locked');
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        resetToHomepage();
       }, 900);
     };
 
