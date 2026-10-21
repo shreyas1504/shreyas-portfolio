@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hidden UX Crisis in Multi-Tenant Systems - Sai Shreyas Vyamajala</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Host+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+:root {
+  /* Boldex Framer Design Tokens */
+  --bg: #0b0c0e;
+  --surface: #13151a;
+  --surface2: #1b1d21;
+  --surface3: #1f2228;
+  --border: #303338;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --accent: #ff6b2b;
+  --accent-dim: rgba(255, 107, 43, 0.12);
+  --accent-border: rgba(255, 107, 43, 0.28);
+  --accent2: #ff6b6b;
+  --accent3: #ff6b2b;
+  --amber: #febc2e;
+  --cyan: #38bdf8;
+  --text: #ffffff;
+  --text-secondary: #dddddd;
+  --muted: #a0a6b2;
+  --tag-bg: rgba(255, 107, 43, 0.1);
+  --font-display: 'Host Grotesk', 'Inter', sans-serif;
+  --font-sans: 'Geist', 'Inter', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+/* PAGE TRANSITION */
+#pt { position: fixed; inset: 0; z-index: 9000; pointer-events: none; display: flex; flex-direction: column; }
+.pts { flex: 1; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+#pt.go .pts { animation: ptOut .48s cubic-bezier(.22,1,.36,1) forwards; }
+#pt.enter .pts { transform: scaleX(1); animation: ptIn .48s cubic-bezier(.22,1,.36,1) forwards; }
+.pts:nth-child(1){animation-delay:0s!important}.pts:nth-child(2){animation-delay:.04s!important}.pts:nth-child(3){animation-delay:.08s!important}.pts:nth-child(4){animation-delay:.12s!important}.pts:nth-child(5){animation-delay:.16s!important}
+@keyframes ptOut { to { transform: scaleX(1); transform-origin: left; } }
+@keyframes ptIn { to { transform: scaleX(0); transform-origin: right; } }
+
+/* PROGRESS BAR */
+#prog {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), #22d3ee);
+  z-index: 600; width: 0; transition: width .1s;
+  box-shadow: 0 0 14px rgba(255, 107, 43, 0.5);
+}
+
+/* BOLDEX FLOATING PILL NAVBAR */
+.nav-shell {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(940px, calc(100% - 32px));
+  z-index: 500;
+}
+nav {
+  background: rgba(19, 21, 26, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 100px;
+  padding: 10px 16px 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+nav::before {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 107, 43, 0.14) 0%, transparent 70%);
+  top: -110px;
+  left: -60px;
+  pointer-events: none;
+}
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+.nav-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--text);
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 14px;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.nav-back-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  transform: translateX(-2px);
+}
+.nav-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--accent-border);
+}
+.nav-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.nav-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.nav-role {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  position: relative;
+  z-index: 2;
+}
+.nav-links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 7px 14px;
+  border-radius: 100px;
+  transition: all .2s;
+}
+.nav-links a:hover {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+}
+.nav-cta {
+  background: var(--accent) !important;
+  color: #0b0c0e !important;
+  font-family: var(--font-display);
+  font-weight: 700 !important;
+  font-size: 13px;
+  padding: 9px 18px !important;
+  border-radius: 100px !important;
+  box-shadow: 0 4px 20px rgba(255, 107, 43, 0.25);
+  transition: all .2s !important;
+}
+.nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 26px rgba(255, 107, 43, 0.4) !important;
+}
+
+/* HERO */
+.hero {
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  padding: 150px 48px 90px;
+  position: relative;
+  overflow: hidden;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.hero-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 30%, black 15%, transparent 100%);
+}
+.hero-glow {
+  position: absolute;
+  width: 650px;
+  height: 650px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 43, 0.1) 0%, transparent 68%);
+  top: -180px;
+  right: -100px;
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 840px;
+  position: relative;
+  z-index: 2;
+}
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 7px 16px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.hero-tag::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent);
+}
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(44px, 6.2vw, 78px);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin-bottom: 26px;
+}
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+.hero-desc {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 640px;
+  line-height: 1.75;
+  margin-bottom: 42px;
+}
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-subtle);
+}
+.meta-i {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+.meta-l {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+.meta-v {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* SECTIONS */
+.section {
+  padding: 96px 48px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.sec-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 18px;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.2vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 700px;
+}
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+  max-width: calc(1180px - 96px);
+  margin: 0 auto;
+}
+
+/* HIGHLIGHT BOX */
+.highlight {
+  background: var(--surface);
+  border: 1px solid var(--accent-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 16px;
+  padding: 26px 30px;
+  margin: 28px 0;
+}
+.highlight p {
+  font-size: 15.5px;
+  color: var(--text-secondary);
+  max-width: 100%;
+  font-style: italic;
+}
+
+/* PROBLEM GRID */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 40px;
+}
+.problem-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .25s, transform .25s;
+}
+.problem-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border);
+}
+.problem-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.problem-card.bad::before { background: var(--accent2); }
+.problem-card.good::before { background: var(--accent); }
+.problem-card-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 100px;
+  display: inline-block;
+  margin-bottom: 18px;
+}
+.bad .problem-card-tag {
+  background: rgba(255, 107, 107, 0.12);
+  color: var(--accent2);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+}
+.good .problem-card-tag {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+.problem-card h3 { font-size: 19px; color: var(--text); }
+.problem-card p { font-size: 14.5px; color: var(--muted); max-width: 100%; margin-top: 8px; }
+
+/* ARCHITECTURE DIAGRAM FRAME */
+.arch-diagram {
+  margin-top: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+.arch-header {
+  padding: 18px 26px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface2);
+}
+.arch-header-title {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.arch-header-title::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.arch-header-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background: var(--surface3);
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+.arch-body { padding: 30px; }
+.arch-layer { margin-bottom: 4px; }
+.arch-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border-subtle);
+  transition: all .2s;
+}
+.arch-row:hover { border-color: var(--border); }
+.arch-row.hl {
+  background: rgba(255, 107, 43, 0.06);
+  border-color: var(--accent-border);
+}
+.arch-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.arch-name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+.arch-detail {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: right;
+}
+.arch-detail.hot { color: var(--accent); }
+.arch-connector {
+  display: flex;
+  justify-content: center;
+  padding: 3px 0;
+  position: relative;
+  height: 20px;
+}
+.arch-connector::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent-border), rgba(255,107,43,0.05));
+}
+.arch-tenants {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+.arch-tenant {
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border-subtle);
+}
+.arch-tenant-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.arch-tenant-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.arch-tenant.iso {
+  background: rgba(255, 107, 43, 0.07);
+  border-color: var(--accent-border);
+}
+.arch-tenant.iso .arch-tenant-name { color: var(--accent); }
+.figma-note {
+  margin-top: 16px;
+  padding: 12px 18px;
+  background: var(--surface2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ISOLATION TABLE */
+.iso-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 28px;
+  font-size: 13.5px;
+  background: var(--surface);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+.iso-table th {
+  text-align: left;
+  padding: 14px 18px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.iso-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.6;
+}
+.iso-table td:first-child {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.iso-table tr:last-child td { border-bottom: none; }
+.iso-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+.badge-g { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+.badge-a { background: rgba(254, 188, 46, 0.12); color: var(--amber); border: 1px solid rgba(254, 188, 46, 0.28); }
+.badge-r { background: rgba(255, 107, 107, 0.12); color: var(--accent2); border: 1px solid rgba(255, 107, 107, 0.25); }
+
+/* PERSONA CARDS */
+.persona-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 44px;
+}
+.persona-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 32px;
+  transition: border-color .25s, transform .25s;
+}
+.persona-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-4px);
+}
+.persona-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+}
+.persona-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.persona-role {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.persona-pain {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 100%;
+}
+.persona-quote {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* JOURNEY MAP */
+.journey-wrapper {
+  margin-top: 44px;
+  overflow-x: auto;
+  padding: 28px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+}
+.journey-track {
+  display: flex;
+  gap: 0;
+  min-width: 880px;
+  position: relative;
+}
+.journey-track::before {
+  content: '';
+  position: absolute;
+  top: 62px;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  z-index: 0;
+}
+.journey-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.journey-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+  margin-top: 54px;
+}
+.journey-step.pain .journey-dot {
+  border-color: var(--accent2);
+  background: rgba(255, 107, 107, 0.25);
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.4);
+}
+.journey-step.neutral .journey-dot { border-color: var(--muted); }
+.journey-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.journey-emotion {
+  position: absolute;
+  top: 0;
+  font-size: 11.5px;
+  text-align: center;
+  max-width: 115px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.journey-step.pain .journey-emotion { color: var(--accent2); font-weight: 500; }
+
+/* INSIGHTS */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 28px;
+}
+.insight-block {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 34px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .25s;
+}
+.insight-block:hover { border-color: var(--accent-border); }
+.insight-num {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(255, 107, 43, 0.12);
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  user-select: none;
+}
+.insight-block h3 { font-size: 18px; margin-bottom: 10px; }
+.insight-block p { font-size: 14.5px; max-width: 100%; }
+
+/* SOLUTION TABS & INTERACTIVE MOCK WINDOW FRAME */
+.solution-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 5px;
+  margin-top: 36px;
+  margin-bottom: 28px;
+  width: fit-content;
+}
+.tab-btn {
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.tab-btn.active {
+  background: var(--accent);
+  color: #0b0c0e;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.mock-window {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+}
+.mock-titlebar {
+  background: var(--surface2);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.mock-dots { display: flex; gap: 7px; }
+.mock-dot { width: 12px; height: 12px; border-radius: 50%; }
+.mock-dot:nth-child(1) { background: #ff5f57; }
+.mock-dot:nth-child(2) { background: #febc2e; }
+.mock-dot:nth-child(3) { background: #28c840; }
+.mock-url {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.admin-layout, .redesign-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 410px;
+}
+.admin-sidebar, .redesign-sidebar {
+  background: #0e1014;
+  border-right: 1px solid var(--border-subtle);
+  padding: 22px 0;
+}
+.sidebar-section { padding: 0 14px; margin-bottom: 20px; }
+.sidebar-title {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 8px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+}
+.sidebar-item, .rs-nav-item {
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.sidebar-item.active, .rs-nav-item.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 600;
+}
+.sidebar-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+.admin-main, .rs-main { padding: 28px 32px; overflow: hidden; }
+.admin-header, .rs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.admin-title, .rs-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+.rs-subtitle { font-size: 12px; color: var(--muted); }
+.rs-brand {
+  padding: 0 20px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 14px;
+}
+.rs-brand-name { font-family: var(--font-display); font-size: 14.5px; font-weight: 700; }
+.rs-brand-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.btn-primary-sm {
+  background: var(--accent);
+  color: #0b0c0e;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-display);
+}
+.btn-ghost-sm {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--muted);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-family: var(--font-mono);
+}
+.data-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+.avatar {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #0b0c0e; margin-right: 10px;
+}
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+.badge-admin { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+.badge-member { background: var(--surface3); color: var(--text-secondary); border: 1px solid var(--border); }
+.badge-guest { background: rgba(255, 107, 107, 0.12); color: var(--accent2); border: 1px solid rgba(255, 107, 107, 0.25); }
+.pain-annotation {
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: #ff9494;
+}
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+}
+.stat-label {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+.stat-change {
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 4px;
+  font-family: var(--font-mono);
+}
+.user-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 90px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.user-table-row.header {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.user-info { display: flex; align-items: center; gap: 10px; }
+.user-name { font-size: 13px; color: var(--text); font-weight: 600; }
+.user-email { font-size: 11px; color: var(--muted); }
+.activity-bar {
+  height: 5px;
+  background: var(--surface3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.activity-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+}
+.success-annotation {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 18px;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+/* RICE FRAMEWORK & METRICS */
+.framework-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 40px;
+}
+.fw-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.fw-rank {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 800;
+  color: rgba(255, 107, 43, 0.12);
+  position: absolute;
+  top: 16px;
+  right: 22px;
+}
+.fw-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.fw-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.fw-reach {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.fw-reach-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.fw-reach-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--surface3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.fw-reach-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent);
+}
+.metric-number {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.metric-unit {
+  font-size: 12px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+}
+.metric-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* LEARNINGS */
+.learnings-list {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.learning-item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 20px;
+  align-items: start;
+  padding: 28px 32px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+}
+.learning-num {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.learning-text h3 { margin-bottom: 6px; font-size: 18px; }
+.learning-text p { font-size: 14.5px; max-width: 100%; }
+
+/* CTA FOOTER */
+.cta-section {
+  background: var(--surface);
+  border-top: 1px solid var(--border-subtle);
+  padding: 96px 48px;
+}
+.cta-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+.cta-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.8vw, 42px);
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+.cta-desc { font-size: 15.5px; color: var(--muted); margin-bottom: 26px; }
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #0b0c0e;
+  font-family: var(--font-display);
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all .2s;
+}
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255, 107, 43, 0.35); }
+.coming-card {
+  background: var(--surface2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+.coming-title { font-family: var(--font-display); font-size: 14.5px; font-weight: 700; margin-bottom: 4px; }
+.coming-sub { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+footer {
+  padding: 32px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.footer-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: var(--muted); transition: color .2s; }
+.footer-links a:hover { color: var(--accent); }
+
+@media (max-width: 920px) {
+  .nav-links { display: none; }
+  .hero, .section { padding-left: 24px; padding-right: 24px; }
+  .hero-meta, .problem-grid, .persona-row, .insights-grid, .framework-grid, .metrics-grid, .cta-inner, .admin-layout, .redesign-layout, .arch-tenants {
+    grid-template-columns: 1fr;
+  }
+  .admin-sidebar, .redesign-sidebar { display: none; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="pt"><div class="pts"></div><div class="pts"></div><div class="pts"></div><div class="pts"></div><div class="pts"></div></div>
+<div id="prog"></div>
+<div class="hero-grid"></div>
+
+<!-- BOLDEX FLOATING PILL NAV -->
+<div class="nav-shell">
+  <nav>
+    <div class="nav-left">
+      <a href="index.html" class="nav-back-btn" data-go="index.html">← Portfolio</a>
+      <a href="index.html" class="nav-id" data-go="index.html">
+        <img src="profile.jpg" alt="Sai Shreyas Vyamajala" class="nav-avatar">
+        <div class="nav-meta">
+          <span class="nav-name">Sai Shreyas Vyamajala</span>
+          <span class="nav-role">Case Study 001 · Multi-Tenant SaaS</span>
+        </div>
+      </a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#solution">Interactive Frame</a></li>
+      <li><a href="#metrics">Impact</a></li>
+      <li><a href="ai-copilot.html" data-go="ai-copilot.html">Case 002 →</a></li>
+    </ul>
+    <a href="mailto:sv3233@nyu.edu" class="nav-cta">Discuss Case ↗</a>
+  </nav>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">PM Case Study 001 · B2B SaaS · Architecture + UX</div>
+    <h1>The Hidden UX Crisis in<br><em>Multi-Tenant Systems</em></h1>
+    <p class="hero-desc">Every B2B SaaS product has two users nobody designs for. Here's how I identified the problem, mapped it to real impact, and redesigned the experience while drawing from building a live multi-tenant e-invoicing platform across 4 countries.</p>
+    <div class="hero-meta">
+      <div class="meta-i"><span class="meta-l">Domain</span><span class="meta-v">B2B SaaS / Enterprise</span></div>
+      <div class="meta-i"><span class="meta-l">Methods</span><span class="meta-v">UX Audit · JTBD · RICE</span></div>
+      <div class="meta-i"><span class="meta-l">Reference</span><span class="meta-v">SMARTeIS · PEPPOL · 4 Countries</span></div>
+      <div class="meta-i"><span class="meta-l">Type</span><span class="meta-v">Practitioner Analysis</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 01 PROBLEM -->
+<section class="section" id="problem">
+  <div class="sec-label">01 - Problem Framing</div>
+  <h2>The two users<br>everyone ignores</h2>
+  <p>When teams build B2B SaaS, they obsess over the end user who is the person doing the daily work. But multi-tenant products ship to entire <em>organizations</em>. That creates two hidden personas who make or break adoption, and most products treat them as afterthoughts.</p>
+
+  <div class="highlight">
+    <p>"In 5 months building SMARTeIS, I watched our team ship a clean dashboard for finance teams - then spend the next 3 months firefighting because Tenant Admins across 4 countries couldn't configure it correctly. The product worked fine. The admin experience was broken. Nobody had designed for the person responsible for making the product work inside their organisation."</p>
+    <p style="margin-top:10px;font-size:13px;color:var(--accent);font-style:normal;font-family:var(--font-mono)"> - First-hand observation, Skill Quotient Group (2025)</p>
+  </div>
+
+  <div class="problem-grid">
+    <div class="problem-card bad">
+      <span class="problem-card-tag">Pain Point</span>
+      <h3>The Tenant Admin is invisible</h3>
+      <p>The person managing users, permissions, and configurations has zero visibility into what their team is actually doing. No health signals. No way to know if onboarding is succeeding or failing silently.</p>
+    </div>
+    <div class="problem-card good">
+      <span class="problem-card-tag">Opportunity</span>
+      <h3>Fixing it = enterprise retention</h3>
+      <p>In B2B SaaS, the Tenant Admin is your champion. They decide whether the tool gets rolled out to more teams, whether the contract renews, and whether they recommend you to peers.</p>
+    </div>
+    <div class="problem-card bad">
+      <span class="problem-card-tag">Pain Point</span>
+      <h3>Platform Operators fly blind</h3>
+      <p>The team running the platform has no consolidated view. They can't see which organizations are struggling or where onboarding drops off across the tenant population.</p>
+    </div>
+    <div class="problem-card good">
+      <span class="problem-card-tag">Opportunity</span>
+      <h3>Platform visibility = proactive CS</h3>
+      <p>Give platform operators a tenant health dashboard and they transform from reactive (responding to support tickets) to proactive (intervening before a tenant churns).</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02 ARCHITECTURE -->
+<section class="section" id="architecture">
+  <div class="sec-label">02 - System Architecture</div>
+  <h2>What multi-tenancy<br>actually means for PMs</h2>
+  <p>Multi-tenancy isn't a backend concern for PMs. It's the decision that determines which features you can ever build. One application serves multiple organizations simultaneously, sharing infrastructure while keeping each tenant's data completely isolated.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-header">
+      <span class="arch-header-title">Multi-Tenant Architecture Stack</span>
+      <span class="arch-header-badge">Interactive System Frame · 5 Layers</span>
+    </div>
+    <div class="arch-body">
+      <div class="arch-layer">
+        <div class="arch-row">
+          <div class="arch-icon"><i data-lucide="monitor" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Presentation Layer</div>
+          <div class="arch-detail">Single UI codebase · tenant-aware rendering</div>
+        </div>
+      </div>
+      <div class="arch-connector"></div>
+      <div class="arch-layer">
+        <div class="arch-row hl">
+          <div class="arch-icon"><i data-lucide="key-round" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Identity &amp; Access Management (IAM)</div>
+          <div class="arch-detail hot">▸ PM owns this · RBAC · SSO · Tenant Scoping</div>
+        </div>
+      </div>
+      <div class="arch-connector"></div>
+      <div class="arch-layer">
+        <div class="arch-row hl">
+          <div class="arch-icon"><i data-lucide="settings" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Tenant Management Layer</div>
+          <div class="arch-detail hot">▸ PM owns this · Onboarding · Config · Feature Flags · Billing</div>
+        </div>
+      </div>
+      <div class="arch-connector"></div>
+      <div class="arch-layer">
+        <div class="arch-row">
+          <div class="arch-icon"><i data-lucide="database" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Data Isolation Layer</div>
+          <div class="arch-detail">Shared DB / Schema-per-tenant / DB-per-tenant</div>
+        </div>
+      </div>
+      <div class="arch-connector"></div>
+      <div class="arch-tenants">
+        <div class="arch-tenant">
+          <div class="arch-tenant-name">Tenant A - Startup</div>
+          <div class="arch-tenant-sub">Shared schema · 12 users · MY</div>
+        </div>
+        <div class="arch-tenant">
+          <div class="arch-tenant-name">Tenant B - Mid-Market</div>
+          <div class="arch-tenant-sub">Shared schema · 340 users · ID</div>
+        </div>
+        <div class="arch-tenant iso">
+          <div class="arch-tenant-name">Tenant C - Enterprise</div>
+          <div class="arch-tenant-sub">Isolated DB · 5,000 users · SG · GDPR</div>
+        </div>
+      </div>
+      <div class="figma-note"><i data-lucide="layers" style="width:14px;height:14px;color:var(--accent)"></i> Each layer maps 1:1 to a named architectural boundary for B2B platform scoping.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:44px">
+    <h3>The three isolation models - and the PM tradeoffs</h3>
+    <table class="iso-table">
+      <thead><tr><th>Model</th><th>How it works</th><th>PM Wins</th><th>PM Risks</th><th>Best for</th></tr></thead>
+      <tbody>
+        <tr><td>Shared DB, Shared Schema</td><td>All tenants in same tables, separated by tenant_id</td><td>Cheapest. Fast iteration. Cross-tenant analytics easy.</td><td>One bad query leaks across tenants. Can't offer data residency.</td><td><span class="badge badge-a">SMB · Early Stage</span></td></tr>
+        <tr><td>Shared DB, Schema-per-Tenant</td><td>Same instance, each tenant gets own schema namespace</td><td>Logical isolation. Easier per-tenant migrations.</td><td>Schema drift risk. Cross-tenant analytics needs careful joins.</td><td><span class="badge badge-g">Mid-Market · Growth</span></td></tr>
+        <tr><td>Database-per-Tenant</td><td>Each tenant has a physically separate database</td><td>Maximum isolation. GDPR-ready. Unlocks enterprise deals.</td><td>Ops overhead scales with tenant count. Very expensive.</td><td><span class="badge badge-r">Enterprise · Compliance</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03 PERSONAS -->
+<section class="section">
+  <div class="sec-label">03 - User Research</div>
+  <h2>Three personas,<br>one broken system</h2>
+  <p>Through building SMARTeIS - a PEPPOL-compliant e-invoicing platform spanning Malaysia, Indonesia, Singapore, and UAE - I mapped the three personas that every multi-tenant product serves, whether it acknowledges them or not.</p>
+  <div class="persona-row">
+    <div class="persona-card">
+      <div class="persona-icon"><i data-lucide="user" style="width:22px;height:22px;color:var(--accent)"></i></div>
+      <div class="persona-name">The End User</div>
+      <div class="persona-role">Finance Analyst · Daily User</div>
+      <p class="persona-pain">Creates invoices, tracks submissions, manages approvals. Switches between ERP and the platform constantly because workflows aren't connected.</p>
+      <div class="persona-quote">"I just need to create an invoice and know it was sent. Why does this take 7 steps?"</div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-icon"><i data-lucide="shield" style="width:22px;height:22px;color:var(--accent2)"></i></div>
+      <div class="persona-name">The Tenant Admin</div>
+      <div class="persona-role">IT Manager · Weekly User</div>
+      <p class="persona-pain">Manages team access, configures regional tax rules, onboards new staff. Has no dashboard showing what's happening in their workspace.</p>
+      <div class="persona-quote">"Three people submitted invoices to the wrong tax authority. How do I know who configured what?"</div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-icon"><i data-lucide="sliders-horizontal" style="width:22px;height:22px;color:var(--cyan)"></i></div>
+      <div class="persona-name">Platform Operator</div>
+      <div class="persona-role">Product/Ops Team · Daily User</div>
+      <p class="persona-pain">Manages all tenants. Knows nothing about individual tenant health. Learns about problems through support tickets and always too late.</p>
+      <div class="persona-quote">"We found out an entire company's invoices were failing compliance checks when they threatened to cancel."</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04 JOURNEY -->
+<section class="section">
+  <div class="sec-label">04 - Journey Mapping</div>
+  <h2>Where the Tenant Admin<br>experience breaks</h2>
+  <p>I mapped the Tenant Admin's full journey from workspace setup through daily operations. The emotional low points cluster in the same 3 places across every B2B SaaS product I analyzed.</p>
+  <div class="journey-wrapper">
+    <div class="journey-track">
+      <div class="journey-step neutral"><div class="journey-emotion">Receives<br>invite link</div><div class="journey-dot"></div><div class="journey-label">Invited</div></div>
+      <div class="journey-step neutral"><div class="journey-emotion">Signs up,<br>lands in app</div><div class="journey-dot"></div><div class="journey-label">Onboard</div></div>
+      <div class="journey-step pain"><div class="journey-emotion">No setup<br>guide exists</div><div class="journey-dot"></div><div class="journey-label">Configure</div></div>
+      <div class="journey-step pain"><div class="journey-emotion">Invites team,<br>no confirmation</div><div class="journey-dot"></div><div class="journey-label">Invite Users</div></div>
+      <div class="journey-step neutral"><div class="journey-emotion">Team starts<br>using product</div><div class="journey-dot"></div><div class="journey-label">Go Live</div></div>
+      <div class="journey-step pain"><div class="journey-emotion">No visibility<br>into usage</div><div class="journey-dot"></div><div class="journey-label">Monitor</div></div>
+      <div class="journey-step pain"><div class="journey-emotion">Finds out via<br>complaint</div><div class="journey-dot"></div><div class="journey-label">Issue Found</div></div>
+      <div class="journey-step neutral"><div class="journey-emotion">Scrambles to<br>fix manually</div><div class="journey-dot"></div><div class="journey-label">Resolve</div></div>
+    </div>
+  </div>
+  <div class="insights-grid">
+    <div class="insight-block"><div class="insight-num">01</div><h3>Zero setup guidance</h3><p>Admins land with no configuration checklist and no indication of what's required before their team can use the product effectively.</p></div>
+    <div class="insight-block"><div class="insight-num">02</div><h3>No workspace health view</h3><p>Once users are onboarded, the Admin has no dashboard showing activation rates, feature adoption by role, or compliance status.</p></div>
+    <div class="insight-block"><div class="insight-num">03</div><h3>Permission changes are invisible</h3><p>When roles are updated, workflows break silently. There's no audit log the Admin can understand without being a technical user.</p></div>
+    <div class="insight-block"><div class="insight-num">04</div><h3>Multi-country complexity ignored</h3><p>Products treat all tenants identically. But a Malaysian team and a Singapore team have different tax obligations, workflows, and risk profiles.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05 SOLUTION FRAME -->
+<section class="section" id="solution">
+  <div class="sec-label">05 - Solution Design &amp; Interactive Frame</div>
+  <h2>Before vs. After:<br>The redesigned experience</h2>
+  <p>I redesigned the Tenant Admin experience around three principles: <strong style="color:var(--text)">visibility first</strong>, <strong style="color:var(--text)">progressive disclosure</strong>, and <strong style="color:var(--text)">proactive health signals</strong>.</p>
+
+  <div class="solution-tabs">
+    <button class="tab-btn active" onclick="switchTab('after',this)">After - Redesigned Health Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('before',this)">Before - Current Broken State</button>
+  </div>
+
+  <div class="tab-content" id="tab-before">
+    <div class="mock-window">
+      <div class="mock-titlebar">
+        <div class="mock-dots"><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div></div>
+        <div class="mock-url">app.smarteis.io/admin/workspace/members</div>
+      </div>
+      <div class="admin-layout">
+        <div class="admin-sidebar">
+          <div class="sidebar-section">
+            <div class="sidebar-title">Workspace</div>
+            <div class="sidebar-item active"><div class="sidebar-dot"></div>Members</div>
+            <div class="sidebar-item"><div class="sidebar-dot"></div>Billing</div>
+            <div class="sidebar-item"><div class="sidebar-dot"></div>Settings</div>
+          </div>
+          <div class="sidebar-section">
+            <div class="sidebar-title">More</div>
+            <div class="sidebar-item"><div class="sidebar-dot"></div>Integrations</div>
+            <div class="sidebar-item"><div class="sidebar-dot"></div>Audit Logs</div>
+          </div>
+        </div>
+        <div class="admin-main">
+          <div class="admin-header">
+            <div class="admin-title">Members</div>
+            <div style="display:flex;gap:10px"><button class="btn-ghost-sm">Export</button><button class="btn-primary-sm">Invite Member</button></div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+            <tbody>
+              <tr><td><span class="avatar" style="background:#ff6b2b">AM</span>Ananya M.</td><td>ananya@co.com</td><td><span class="badge-role badge-admin">Admin</span></td><td>Jan 3, 2025</td></tr>
+              <tr><td><span class="avatar" style="background:#ff6b6b;color:#fff">RK</span>Rahul K.</td><td>rahul@co.com</td><td><span class="badge-role badge-member">Member</span></td><td>Jan 5, 2025</td></tr>
+              <tr><td><span class="avatar" style="background:#38bdf8">PT</span>Priya T.</td><td>priya@co.com</td><td><span class="badge-role badge-guest">Guest</span></td><td>Feb 1, 2025</td></tr>
+            </tbody>
+          </table>
+          <div class="pain-annotation">⚠ No activity data, no setup completion status, no health signals. The Admin can see WHO is in the workspace but nothing about whether invoices are failing PEPPOL compliance or which users are stuck.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content active" id="tab-after">
+    <div class="mock-window">
+      <div class="mock-titlebar">
+        <div class="mock-dots"><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div></div>
+        <div class="mock-url">app.smarteis.io/admin - Workspace Health Dashboard</div>
+      </div>
+      <div class="redesign-layout">
+        <div class="redesign-sidebar">
+          <div class="rs-brand"><div class="rs-brand-name">Acme Corp</div><div class="rs-brand-sub">Malaysia · 12 members</div></div>
+          <div class="rs-nav-item active"><i data-lucide="activity" style="width:14px;height:14px"></i>Workspace Health</div>
+          <div class="rs-nav-item"><i data-lucide="users" style="width:14px;height:14px"></i>Members</div>
+          <div class="rs-nav-item"><i data-lucide="lock" style="width:14px;height:14px"></i>Permissions</div>
+          <div class="rs-nav-item"><i data-lucide="file-text" style="width:14px;height:14px"></i>Audit Log</div>
+          <div class="rs-nav-item"><i data-lucide="settings" style="width:14px;height:14px"></i>Configuration</div>
+        </div>
+        <div class="rs-main">
+          <div class="rs-header">
+            <div><div class="rs-title">Workspace Health</div><div class="rs-subtitle">Last updated 2 minutes ago · Malaysia PEPPOL workspace</div></div>
+            <button class="btn-primary-sm">+ Invite Member</button>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Total Members</div><div class="stat-change">↑ 3 this week</div></div>
+            <div class="stat-card"><div class="stat-value">9</div><div class="stat-label">Active (7d)</div><div class="stat-change">75% activation</div></div>
+            <div class="stat-card"><div class="stat-value">100%</div><div class="stat-label">Compliance</div><div class="stat-change">✓ All clear</div></div>
+            <div class="stat-card"><div class="stat-value">4/5</div><div class="stat-label">Setup Steps</div><div class="stat-change" style="color:var(--amber)">1 remaining</div></div>
+          </div>
+          <div class="user-table-row header"><div>Member</div><div>Role</div><div>Activity (7d)</div><div>Status</div><div></div></div>
+          <div class="user-table-row">
+            <div class="user-info"><span class="avatar" style="background:#ff6b2b">AM</span><div><div class="user-name">Ananya M.</div><div class="user-email">ananya@co.com</div></div></div>
+            <div><span class="badge-role badge-admin">Admin</span></div>
+            <div><div class="activity-bar"><div class="activity-fill" style="width:90%"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">High</div></div>
+            <div><span class="badge-role badge-admin">Active</span></div>
+            <div style="text-align:right"><button class="btn-ghost-sm" style="padding:5px 10px;font-size:11px">Manage</button></div>
+          </div>
+          <div class="user-table-row">
+            <div class="user-info"><span class="avatar" style="background:#ff6b6b;color:#fff">RK</span><div><div class="user-name">Rahul K.</div><div class="user-email">rahul@co.com</div></div></div>
+            <div><span class="badge-role badge-member">Member</span></div>
+            <div><div class="activity-bar"><div class="activity-fill" style="width:30%;background:var(--amber)"></div></div><div style="font-size:10px;color:var(--amber);margin-top:3px">Low - nudge?</div></div>
+            <div><span class="badge-role" style="background:rgba(254,188,46,.12);color:var(--amber);border:1px solid rgba(254,188,46,.28)">At risk</span></div>
+            <div style="text-align:right"><button class="btn-primary-sm" style="padding:5px 12px;font-size:11px">Nudge</button></div>
+          </div>
+          <div class="success-annotation">✓ Tenant Admin now sees activation health, PEPPOL compliance status, and at-risk users in real time - enabling proactive intervention before support tickets or churn.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 06 PRIORITIZATION -->
+<section class="section">
+  <div class="sec-label">06 - Prioritization</div>
+  <h2>What to build first:<br>RICE framework applied</h2>
+  <p>With limited engineering bandwidth, I used RICE scoring to prioritize the three core improvements to the Tenant Admin experience.</p>
+  <div class="framework-grid">
+    <div class="fw-card"><div class="fw-rank">01</div><div class="fw-label">Highest Priority</div><div class="fw-title">Workspace Health Dashboard</div><p style="font-size:14px;max-width:100%">Activity summaries, compliance status, and at-risk user signals. Highest reach because every Tenant Admin uses it weekly. Directly maps to churn prevention.</p><div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin:14px 0 8px;border-top:1px solid var(--border-subtle);padding-top:10px">R: 100% Admins · I: 3/3 · C: 90% · E: 2 wks</div><div class="fw-reach"><span class="fw-reach-label">RICE</span><div class="fw-reach-bar"><div class="fw-reach-fill" style="width:92%"></div></div><span style="font-size:12px;color:var(--accent);font-family:var(--font-mono);font-weight:700">92</span></div></div>
+    <div class="fw-card"><div class="fw-rank">02</div><div class="fw-label">High Priority</div><div class="fw-title">Setup Completion Checklist</div><p style="font-size:14px;max-width:100%">Step-by-step onboarding guide for Tenant Admins with progress tracking. Reduces time to value and support tickets during the first 30 days.</p><div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin:14px 0 8px;border-top:1px solid var(--border-subtle);padding-top:10px">R: New Admins · I: 2/3 · C: 85% · E: 1.5 wks</div><div class="fw-reach"><span class="fw-reach-label">RICE</span><div class="fw-reach-bar"><div class="fw-reach-fill" style="width:74%"></div></div><span style="font-size:12px;color:var(--accent);font-family:var(--font-mono);font-weight:700">74</span></div></div>
+    <div class="fw-card"><div class="fw-rank">03</div><div class="fw-label">Medium Priority</div><div class="fw-title">Human-Readable Audit Log</div><p style="font-size:14px;max-width:100%">Plain-English activity feed showing "Rahul's permissions changed by Ananya on Feb 3." Currently only readable by engineers. High effort, major pain point.</p><div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin:14px 0 8px;border-top:1px solid var(--border-subtle);padding-top:10px">R: All Admins · I: 2/3 · C: 70% · E: 4 wks</div><div class="fw-reach"><span class="fw-reach-label">RICE</span><div class="fw-reach-bar"><div class="fw-reach-fill" style="width:55%"></div></div><span style="font-size:12px;color:var(--accent);font-family:var(--font-mono);font-weight:700">55</span></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 07 METRICS -->
+<section class="section" id="metrics">
+  <div class="sec-label">07 - Success Metrics</div>
+  <h2>How I'd measure<br>if this worked</h2>
+  <p>Good PM work defines success metrics before building. These are the four KPIs that would validate the redesign of the Tenant Admin experience: each mapped to a specific business outcome, not just a feature metric.</p>
+  <div class="metrics-grid">
+    <div class="metric-card"><div class="metric-number">↓40%</div><div class="metric-unit">Target · 60 days</div><div class="metric-desc">Reduction in Tenant Admin support tickets. Baseline: ~8–12 config tickets/month observed at SMARTeIS.</div></div>
+    <div class="metric-card"><div class="metric-number">↑25%</div><div class="metric-unit">Target · 30-day cohort</div><div class="metric-desc">Increase in team activation rate from ~55% baseline to 80% with a guided setup checklist.</div></div>
+    <div class="metric-card"><div class="metric-number">↑15%</div><div class="metric-unit">Target · NRR</div><div class="metric-desc">Improvement in net revenue retention by preventing 1–2 at-risk tenant churns per quarter.</div></div>
+    <div class="metric-card"><div class="metric-number">↓3 days</div><div class="metric-unit">Target · Time to Config</div><div class="metric-desc">Reduction in Time to Full Configuration from 5–7 days baseline down to 2–4 days.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 08 LEARNINGS -->
+<section class="section">
+  <div class="sec-label">08 - Key Learnings</div>
+  <h2>What building multi-tenant<br>products actually taught me</h2>
+  <div class="learnings-list">
+    <div class="learning-item"><div class="learning-num">01</div><div class="learning-text"><h3>Compliance is a UX problem, not just a legal one</h3><p>Working across Malaysia, Indonesia, Singapore, and UAE, I saw that different tax authorities, invoice formats, and submission deadlines create user confusion. Translate compliance constraints into clear, contextual UI moments so users don't hide them in error messages.</p></div></div>
+    <div class="learning-item"><div class="learning-num">02</div><div class="learning-text"><h3>Your admin user IS your sales motion</h3><p>In B2B SaaS, the Tenant Admin expands the contract, advocates internally, and decides whether to roll the product out to more teams. Every hour saved for a Tenant Admin is a direct input into expansion revenue.</p></div></div>
+    <div class="learning-item"><div class="learning-num">03</div><div class="learning-text"><h3>Multi-tenant metrics need tenant-level segmentation</h3><p>Global DAU is meaningless when your product serves 50 organizations. A large, low-engagement tenant masks a small, highly-engaged one. Build tenant-level health scores into your analytics from day one.</p></div></div>
+    <div class="learning-item"><div class="learning-num">04</div><div class="learning-text"><h3>Customization vs. standardization is the hardest PM tradeoff</h3><p>Every enterprise asks for custom workflows. Saying yes to everything creates an unmaintainable product. Find the 20% of customization that satisfies 80% of enterprise needs and build configuration, not bespoke code, for the rest.</p></div></div>
+  </div>
+</section>
+
+<!-- NEXT CASE CTA -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <div>
+      <a href="index.html" class="nav-back-btn" data-go="index.html" style="margin-bottom:22px">← Back to Portfolio</a>
+      <div class="cta-label">Up Next · Case Study 002</div>
+      <div class="cta-title">AI Product Ops Co-pilot</div>
+      <p class="cta-desc">PMs lose 40% of their week to status syncs and ticket triage. A purpose-built AI co-pilot - and the full RAG architecture, eval loops, and trust mechanisms behind shipping it responsibly at B2B scale.</p>
+      <a href="ai-copilot.html" class="btn-cta" data-go="ai-copilot.html">Read Case Study 002 →</a>
+    </div>
+    <div>
+      <div class="cta-label">Also in Portfolio</div>
+      <div class="coming-card"><div class="coming-title">Arcus - Retail Investing &amp; Portfolio Risk Platform</div><div class="coming-sub">Founder · 75+ Active Users · 90% AI Eval Harness · NYU Leslie eLab</div></div>
+      <div class="coming-card"><div class="coming-title">TruVideo - AI Model Benchmarking &amp; 4,000+ Account Launch</div><div class="coming-sub">Product &amp; Data · Misdetection 46.2% → 30.8% · $450K+ Revenue Case</div></div>
+      <div class="coming-card"><div class="coming-title">003 - AI Safety, Evaluation &amp; Rollback</div><div class="coming-sub">AI Safety · Eval Pipelines · Feature Flags · Incident Response</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-name">Sai Shreyas Vyamajala · NYU MOT '27</span>
+  <div class="footer-links">
+    <a href="index.html" data-go="index.html">Portfolio Home</a>
+    <a href="https://linkedin.com/in/shreyas1504" target="_blank">LinkedIn</a>
+    <a href="https://github.com/shreyas1504" target="_blank">GitHub</a>
+    <a href="mailto:sv3233@nyu.edu">sv3233@nyu.edu</a>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', () => {
+  const s = document.documentElement.scrollTop;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('prog').style.width = (s / h * 100) + '%';
+}, { passive: true });
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function goTo(href) {
+  const pt = document.getElementById('pt');
+  pt.classList.add('go');
+  pt.style.pointerEvents = 'all';
+  setTimeout(() => window.location.href = href, 480);
+}
+document.querySelectorAll('[data-go]').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    goTo(el.getAttribute('data-go'));
+  });
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Product Ops Co‑pilot - Sai Shreyas Vyamajala</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Host+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+:root {
+  --bg: #0b0c0e;
+  --sf: #13151a;
+  --sf2: #1b1d21;
+  --sf3: #1f2228;
+  --bdr: #303338;
+  --bdr2: rgba(255, 255, 255, 0.08);
+  --accent: #ff6b2b;
+  --accent2: #38bdf8;
+  --accent3: #ff6b2b;
+  --accent4: #fb923c;
+  --red: #ff6b6b;
+  --text: #ffffff;
+  --text-sec: #dddddd;
+  --muted: #a0a6b2;
+  --muted2: #767d8a;
+  --vbg: rgba(255, 107, 43, 0.1);
+  --vbl: rgba(255, 107, 43, 0.28);
+  --cbg: rgba(56, 189, 248, 0.1);
+  --cbl: rgba(56, 189, 248, 0.25);
+  --gbg: rgba(255, 107, 43, 0.08);
+  --gbl: rgba(255, 107, 43, 0.25);
+  --rbg: rgba(255, 107, 107, 0.1);
+  --rbl: rgba(255, 107, 107, 0.25);
+  --obg: rgba(251, 146, 60, 0.1);
+  --obl: rgba(251, 146, 60, 0.25);
+  --font-display: 'Host Grotesk', 'Inter', sans-serif;
+  --font-sans: 'Geist', 'Inter', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+a { text-decoration: none; color: inherit; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--sf3); border-radius: 4px; }
+
+/* PAGE TRANSITION */
+#pt { position: fixed; inset: 0; z-index: 9000; pointer-events: none; display: flex; flex-direction: column; }
+.pts { flex: 1; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+#pt.go .pts { animation: ptOut .48s cubic-bezier(.22,1,.36,1) forwards; }
+.pts:nth-child(1){animation-delay:0s!important}.pts:nth-child(2){animation-delay:.04s!important}.pts:nth-child(3){animation-delay:.08s!important}.pts:nth-child(4){animation-delay:.12s!important}.pts:nth-child(5){animation-delay:.16s!important}
+@keyframes ptOut { to { transform: scaleX(1); transform-origin: left; } }
+
+/* PROGRESS */
+#prog {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  z-index: 600; width: 0; transition: width .12s;
+  box-shadow: 0 0 14px rgba(255, 107, 43, 0.5);
+}
+
+/* BOLDEX FLOATING PILL NAVBAR */
+.nav-shell {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(940px, calc(100% - 32px));
+  z-index: 500;
+}
+nav {
+  background: rgba(19, 21, 26, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--bdr2);
+  border-radius: 100px;
+  padding: 10px 16px 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+nav::before {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 107, 43, 0.14) 0%, transparent 70%);
+  top: -110px;
+  left: -60px;
+  pointer-events: none;
+}
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+.nav-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--text);
+  background: var(--sf3);
+  border: 1px solid var(--bdr);
+  border-radius: 100px;
+  padding: 8px 14px;
+  transition: all .2s;
+}
+.nav-back-btn:hover {
+  background: var(--vbg);
+  border-color: var(--vbl);
+  color: var(--accent);
+  transform: translateX(-2px);
+}
+.nav-id { display: flex; align-items: center; gap: 10px; }
+.nav-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  object-fit: cover; border: 1.5px solid var(--vbl);
+}
+.nav-meta { display: flex; flex-direction: column; line-height: 1.2; }
+.nav-name { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: var(--text); }
+.nav-role { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+.nav-links {
+  display: flex; gap: 4px; list-style: none;
+  position: relative; z-index: 2;
+}
+.nav-links a {
+  font-size: 13px; font-weight: 500; color: var(--text-sec);
+  padding: 7px 14px; border-radius: 100px; transition: all .2s;
+}
+.nav-links a:hover { color: var(--accent); background: rgba(255,255,255,.04); }
+.nav-cta {
+  background: var(--accent) !important;
+  color: #0b0c0e !important;
+  font-family: var(--font-display);
+  font-weight: 700 !important;
+  font-size: 13px;
+  padding: 9px 18px !important;
+  border-radius: 100px !important;
+  box-shadow: 0 4px 20px rgba(255, 107, 43, 0.25);
+}
+
+/* HERO */
+.hero {
+  padding: 150px 64px 96px;
+  max-width: 1180px;
+  margin: 0 auto;
+  position: relative;
+}
+.hero-grid {
+  position: fixed; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 30%, black 15%, transparent 100%);
+}
+.hero-glow {
+  position: absolute; width: 680px; height: 680px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 43, 0.1) 0%, transparent 65%);
+  top: -180px; right: -120px; pointer-events: none;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--sf); border: 1px solid var(--bdr);
+  border-radius: 100px; padding: 7px 16px;
+  font-size: 11.5px; font-family: var(--font-mono);
+  color: var(--accent); letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 26px;
+}
+.hero-eyebrow::before {
+  content: ''; width: 7px; height: 7px;
+  background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent);
+}
+.hero-h {
+  font-family: var(--font-display);
+  font-size: clamp(44px, 6.2vw, 78px);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.032em;
+  margin-bottom: 26px;
+}
+.hero-h em {
+  font-style: normal;
+  color: var(--accent);
+}
+.hero-sub {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 640px;
+  line-height: 1.78;
+  margin-bottom: 32px;
+}
+.hero-sub strong { color: var(--text); font-weight: 600; }
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 38px; }
+.tag {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: .05em; padding: 5px 12px;
+  border-radius: 100px; border: 1px solid var(--bdr);
+  color: var(--text-sec); background: var(--sf);
+}
+.tag.v { background: var(--vbg); color: var(--accent); border-color: var(--vbl); }
+.tag.c { background: var(--cbg); color: var(--accent2); border-color: var(--cbl); }
+.tag.g { background: var(--gbg); color: var(--accent3); border-color: var(--gbl); }
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding-top: 28px;
+  border-top: 1px solid var(--bdr2);
+}
+.hm {
+  background: var(--sf);
+  border: 1px solid var(--bdr2);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+.hm-l {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
+}
+.hm-v { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; color: var(--text); }
+
+/* LAYOUT */
+.page-wrap { max-width: 1180px; margin: 0 auto; }
+.section {
+  padding: 84px 64px;
+  border-top: 1px solid var(--bdr2);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 72px;
+  align-items: start;
+}
+.sec-lbl { position: sticky; top: 96px; }
+.sec-idx {
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--vbg);
+  border: 1px solid var(--vbl);
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+}
+.sec-name {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* TYPOGRAPHY */
+h2.sh {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.6vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+h2.sh em { font-style: normal; color: var(--accent); }
+h3.sh3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 36px 0 12px;
+}
+p.sp {
+  font-size: 15.5px;
+  line-height: 1.82;
+  color: var(--muted);
+  margin-bottom: 16px;
+  max-width: 700px;
+}
+p.sp strong { color: var(--text); font-weight: 600; }
+p.sp em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+/* PULL QUOTE */
+.pq {
+  border-left: 3px solid var(--accent);
+  padding: 20px 26px;
+  margin: 28px 0;
+  background: var(--sf);
+  border-top: 1px solid var(--bdr2);
+  border-right: 1px solid var(--bdr2);
+  border-bottom: 1px solid var(--bdr2);
+  border-radius: 0 16px 16px 0;
+}
+.pq p {
+  font-family: var(--font-display);
+  font-size: 17.5px;
+  font-style: italic;
+  color: var(--text-sec);
+  line-height: 1.55;
+  margin: 0;
+}
+.pq cite {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* CARDS */
+.card {
+  background: var(--sf);
+  border: 1px solid var(--bdr2);
+  border-radius: 18px;
+  padding: 26px;
+  transition: border-color .2s, transform .2s;
+}
+.card:hover { border-color: var(--bdr); transform: translateY(-2px); }
+.card-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+.card.v { border-color: var(--vbl); } .card.v .card-tag { background: var(--vbg); color: var(--accent); }
+.card.c { border-color: var(--cbl); } .card.c .card-tag { background: var(--cbg); color: var(--accent2); }
+.card.g { border-color: var(--gbl); } .card.g .card-tag { background: var(--gbg); color: var(--accent3); }
+.card.r { border-color: var(--rbl); } .card.r .card-tag { background: var(--rbg); color: var(--red); }
+.card.o { border-color: var(--obl); } .card.o .card-tag { background: var(--obg); color: var(--accent4); }
+.card h4 {
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.card p { font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+.card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.card li { font-size: 13.5px; color: var(--muted); display: flex; gap: 8px; line-height: 1.5; }
+.card li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+.card.r li::before { content: '✗'; color: var(--red); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 20px 0; }
+
+/* HIGHLIGHT NOTE */
+.hl {
+  padding: 16px 20px;
+  border-radius: 14px;
+  margin: 18px 0;
+  font-size: 13px;
+  line-height: 1.65;
+  font-family: var(--font-mono);
+}
+.hl.v { background: var(--vbg); border: 1px solid var(--vbl); color: var(--accent); }
+.hl.c { background: var(--cbg); border: 1px solid var(--cbl); color: var(--accent2); }
+
+/* PERSONA */
+.persona {
+  background: var(--sf);
+  border: 1px solid var(--bdr2);
+  border-radius: 18px;
+  padding: 26px;
+}
+.p-role {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+}
+.p-name {
+  font-family: var(--font-display); font-size: 20px;
+  font-weight: 800; color: var(--text); margin-bottom: 4px;
+}
+.p-title { font-size: 12px; color: var(--muted); margin-bottom: 18px; font-family: var(--font-mono); }
+.p-section-lbl { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+.p-section-lbl.r { color: var(--red); } .p-section-lbl.g { color: var(--accent3); }
+.p-items { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.p-item { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; line-height: 1.5; }
+.p-item.pain::before { content: '✗'; color: var(--red); flex-shrink: 0; }
+.p-item.job::before { content: '→'; color: var(--accent3); flex-shrink: 0; }
+.p-quote {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--sf2); border-left: 2px solid var(--accent);
+  border-radius: 0 8px 8px 0; font-size: 12.5px; font-style: italic; color: var(--text-sec);
+}
+
+/* ARCH DIAGRAM FRAME */
+.arch {
+  background: var(--sf);
+  border: 1px solid var(--bdr);
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 24px 0;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.arch-hdr {
+  background: var(--sf2);
+  border-bottom: 1px solid var(--bdr2);
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.arch-hdr-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.arch-hdr-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  border: 1px solid var(--bdr);
+  background: var(--sf3);
+  border-radius: 100px;
+  padding: 3px 10px;
+}
+.arch-body { padding: 24px; }
+.arch-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-radius: 11px;
+  background: var(--sf2); border: 1px solid var(--bdr2);
+  margin-bottom: 6px;
+}
+.arch-row.hot { background: rgba(255, 107, 43, 0.06); border-color: var(--vbl); }
+.arch-row.cyan { background: rgba(56, 189, 248, 0.06); border-color: var(--cbl); }
+.arch-row.green { background: rgba(255, 107, 43, 0.08); border-color: var(--gbl); }
+.arch-icon { width: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent); }
+.arch-name { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--text); flex: 1; }
+.arch-sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+.arch-badge { font-family: var(--font-mono); font-size: 10px; padding: 3px 9px; border-radius: 100px; }
+.arch-badge.v { background: var(--vbg); color: var(--accent); border: 1px solid var(--vbl); }
+.arch-badge.g { background: var(--gbg); color: var(--accent3); border: 1px solid var(--gbl); }
+.arch-conn {
+  display: flex; justify-content: center; align-items: center;
+  height: 26px; font-family: var(--font-mono); font-size: 10.5px;
+  color: var(--accent); gap: 8px;
+}
+.arch-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+.arch-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+
+/* FLOW STEPS */
+.flow {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 10px; margin: 24px 0;
+}
+.flow-step {
+  text-align: center; padding: 20px 12px;
+  background: var(--sf); border: 1px solid var(--bdr2); border-radius: 16px;
+}
+.fs-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px; border: 1px solid var(--bdr);
+}
+.fs-icon.v { background: var(--vbg); border-color: var(--vbl); color: var(--accent); }
+.fs-icon.c { background: var(--cbg); border-color: var(--cbl); color: var(--accent2); }
+.fs-icon.g { background: var(--gbg); border-color: var(--gbl); color: var(--accent3); }
+.fs-lbl { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+.fs-desc { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+
+/* INTERACTIVE CHAT MOCKUP FRAME */
+.chat {
+  background: var(--sf);
+  border: 1px solid var(--bdr);
+  border-radius: 20px;
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+}
+.chat-hdr {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--bdr2);
+}
+.chat-hdr::before {
+  content: ''; width: 7px; height: 7px;
+  border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+.chat-msg { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+.chat-msg.ai { flex-direction: row-reverse; }
+.chat-av {
+  width: 32px; height: 32px; border-radius: 10px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; font-family: var(--font-display);
+}
+.chat-av.u { background: var(--sf3); color: var(--text); border: 1px solid var(--bdr); }
+.chat-av.bot { background: var(--vbg); color: var(--accent); border: 1px solid var(--vbl); font-family: var(--font-mono); font-size: 11px; }
+.chat-bubble {
+  background: var(--sf2); border: 1px solid var(--bdr2);
+  border-radius: 14px; padding: 14px 18px;
+  max-width: 82%; color: var(--text-sec); line-height: 1.6; font-size: 13.5px;
+}
+.chat-bubble.bot {
+  background: rgba(255, 107, 43, 0.05);
+  border-color: var(--vbl); color: var(--text);
+}
+.chat-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 5px; }
+.chat-cite {
+  padding: 10px 14px; background: var(--sf2);
+  border: 1px solid var(--bdr2); border-radius: 10px;
+  font-size: 11.5px; color: var(--muted); margin-top: 8px;
+  font-family: var(--font-mono);
+}
+.chat-cite strong { color: var(--accent); }
+.chat-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.chat-btn {
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 11.5px; font-family: var(--font-mono);
+  cursor: pointer; border: 1px solid var(--bdr);
+  background: var(--sf3); color: var(--text-sec); transition: all .15s;
+}
+.chat-btn:hover { border-color: var(--vbl); color: var(--accent); }
+.chat-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; background: var(--gbg);
+  border: 1px solid var(--gbl); border-radius: 100px;
+  font-size: 10.5px; font-family: var(--font-mono); color: var(--accent3);
+}
+
+/* METRICS & RICE */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0; }
+.met {
+  background: var(--sf); border: 1px solid var(--bdr2);
+  border-radius: 18px; padding: 24px; text-align: center;
+}
+.met-n { font-family: var(--font-display); font-size: 34px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+.met-n.c { color: var(--accent2); } .met-n.o { color: var(--accent4); }
+.met-l { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.met-d { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+.rice-table {
+  width: 100%; border-collapse: collapse; margin: 20px 0;
+  background: var(--sf); border-radius: 16px; overflow: hidden; border: 1px solid var(--bdr2);
+}
+.rice-table th {
+  text-align: left; padding: 12px 16px;
+  background: var(--sf2); border-bottom: 1px solid var(--bdr2);
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.rice-table td {
+  padding: 14px 16px; border-bottom: 1px solid var(--bdr2);
+  font-size: 13px; color: var(--muted); vertical-align: middle;
+}
+.rice-table td:first-child { color: var(--text); font-weight: 600; font-family: var(--font-display); }
+.rice-score {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 100px; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+}
+.rice-score.hi { background: var(--vbg); color: var(--accent); border: 1px solid var(--vbl); }
+.rice-score.md { background: var(--cbg); color: var(--accent2); border: 1px solid var(--cbl); }
+.rice-score.lo { background: var(--sf3); color: var(--text-sec); border: 1px solid var(--bdr); }
+
+/* PHASE & FRAMEWORK BOX */
+.phase {
+  background: var(--sf); border: 1px solid var(--bdr2);
+  border-radius: 18px; padding: 24px; position: relative; overflow: hidden;
+}
+.phase::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+.phase.v2::before { background: var(--accent2); }
+.phase.future::before { background: var(--accent4); }
+.phase-lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; color: var(--accent); }
+.phase h4 { font-family: var(--font-display); font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.phase-dur { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.phase ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.phase li { font-size: 13px; color: var(--muted); display: flex; gap: 8px; line-height: 1.5; }
+.phase li::before { content: '·'; color: var(--accent); font-weight: 700; }
+
+.fwbox {
+  background: var(--sf); border: 1px solid var(--bdr2);
+  border-radius: 18px; padding: 26px; margin: 20px 0;
+}
+.fwbox-hdr {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 16px;
+}
+.fwbox-row {
+  display: flex; gap: 16px; padding: 13px 0;
+  border-bottom: 1px solid var(--bdr2); align-items: flex-start;
+}
+.fwbox-row:last-child { border-bottom: none; }
+.fwbox-key {
+  font-family: var(--font-mono); font-size: 11.5px;
+  color: var(--accent); font-weight: 600; width: 100px; flex-shrink: 0;
+}
+.fwbox-val { font-size: 13.5px; color: var(--muted); line-height: 1.65; }
+.fwbox-val strong { color: var(--text); }
+
+/* LEARNING ROW */
+.lr {
+  display: grid; grid-template-columns: 56px 1fr;
+  gap: 20px; padding: 26px; margin-bottom: 12px;
+  background: var(--sf); border: 1px solid var(--bdr2); border-radius: 18px;
+}
+.lr-n { font-family: var(--font-display); font-size: 34px; font-weight: 800; color: var(--accent); line-height: 1; }
+.lr-h { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.lr-d { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+/* CASE NAV FOOTER */
+.cnav {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--bdr2);
+  max-width: 1180px; margin: 0 auto;
+}
+.cnav-half {
+  padding: 48px 64px; display: flex; align-items: center;
+  justify-content: space-between; gap: 20px; transition: background .2s;
+}
+.cnav-half:hover { background: var(--sf); }
+.cnav-half:last-child { border-left: 1px solid var(--bdr2); }
+.cn-dir { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.cn-h { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+.cn-d { font-size: 13.5px; color: var(--muted); max-width: 320px; }
+.cn-btn {
+  padding: 11px 22px; border-radius: 100px;
+  font-size: 13px; font-weight: 700; font-family: var(--font-display);
+  background: var(--sf3); border: 1px solid var(--bdr);
+  color: var(--text); white-space: nowrap; transition: all .2s;
+}
+.cnav-half:hover .cn-btn { background: var(--accent); color: #0b0c0e; border-color: var(--accent); }
+
+@media (max-width: 960px) {
+  .nav-links { display: none; }
+  .section { grid-template-columns: 1fr; gap: 28px; padding: 60px 24px; }
+  .sec-lbl { position: static; }
+  .hero { padding: 120px 24px 64px; }
+  .hero-meta, .metrics, .grid2, .grid3, .arch-3, .arch-2, .flow, .cnav { grid-template-columns: 1fr; }
+  .cnav-half:last-child { border-left: none; border-top: 1px solid var(--bdr2); }
+}
+</style>
+</head>
+<body>
+
+<div id="pt"><div class="pts"></div><div class="pts"></div><div class="pts"></div><div class="pts"></div><div class="pts"></div></div>
+<div id="prog"></div>
+<div class="hero-grid"></div>
+
+<!-- BOLDEX FLOATING PILL NAV -->
+<div class="nav-shell">
+  <nav>
+    <div class="nav-left">
+      <a href="index.html" class="nav-back-btn" data-go="index.html">← Portfolio</a>
+      <a href="index.html" class="nav-id" data-go="index.html">
+        <img src="profile.jpg" alt="Sai Shreyas Vyamajala" class="nav-avatar">
+        <div class="nav-meta">
+          <span class="nav-name">Sai Shreyas Vyamajala</span>
+          <span class="nav-role">Case Study 002 · AI Product Ops</span>
+        </div>
+      </a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#architecture">RAG Architecture</a></li>
+      <li><a href="#ux">Interactive Workspace</a></li>
+      <li><a href="#metrics">RICE &amp; Metrics</a></li>
+      <li><a href="multitenant.html" data-go="multitenant.html">← Case 001</a></li>
+    </ul>
+    <a href="mailto:sv3233@nyu.edu" class="nav-cta">Discuss Case ↗</a>
+  </nav>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">Case Study / 002 / AI · B2B Product Strategy</div>
+  <h1 class="hero-h">AI Product<br>Ops <em>Co‑pilot</em></h1>
+  <p class="hero-sub">In my research (n=8 PM interviews), PMs spend <strong>30–40% of their week</strong> on status syncs, context archaeology, and stakeholder Q&amp;A - none of it strategic. I designed a purpose-built AI assistant and worked through the full product, RAG architecture, and trust decisions needed to ship it responsibly at B2B scale.</p>
+  <div class="hero-tags">
+    <span class="tag v">Product Strategy</span>
+    <span class="tag v">LLM Architecture</span>
+    <span class="tag c">RAG Systems</span>
+    <span class="tag c">B2B Internal Tool</span>
+    <span class="tag g">Trust &amp; Safety</span>
+    <span class="tag">User Research</span>
+    <span class="tag">JTBD · RICE · MoSCoW</span>
+  </div>
+  <div class="hero-meta">
+    <div class="hm"><div class="hm-l">Type</div><div class="hm-v">Product Strategy Case</div></div>
+    <div class="hm"><div class="hm-l">Role</div><div class="hm-v">PM Lead &amp; Architect</div></div>
+    <div class="hm"><div class="hm-l">Research</div><div class="hm-v">8 PM Interviews + Secondary</div></div>
+    <div class="hm"><div class="hm-l">Framing</div><div class="hm-v">Discovery → RAG → Launch</div></div>
+  </div>
+</section>
+
+<div class="page-wrap">
+
+<!-- 01 ORIGIN -->
+<section class="section" id="origin">
+  <div class="sec-lbl">
+    <div class="sec-idx">01</div>
+    <div class="sec-name">Where This Started</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">Not a textbook problem.<br><em>I watched it happen.</em></h2>
+    <p class="sp">During my SDE internship building the SMARTeIS multi-tenant invoicing platform at Skill Quotient Group, I was in the same Slack channels as the PM team. Every Monday morning, the PM wrote the same project context three times: once in a Jira comment, once in a stakeholder email, and once in a Slack update to the Eng lead.</p>
+    <p class="sp">Nothing was wrong. The PM was competent. The tools worked fine. But the <strong>tools didn't talk to each other</strong>, didn't remember context, and couldn't draft anything. Every week started from zero.</p>
+    <div class="pq">
+      <p>"I'm basically a human ETL pipeline. I ingest status from five places and output the same summary six times a week."</p>
+      <cite> - PM, Skill Quotient Group</cite>
+    </div>
+    <p class="sp">That sentence became the seed of this case study. Eight user interviews later, I had a clear structural picture of where PM time goes and how to solve it without sacrificing human trust.</p>
+  </div>
+</section>
+
+<!-- 02 DISCOVERY -->
+<section class="section" id="discovery">
+  <div class="sec-lbl">
+    <div class="sec-idx">02</div>
+    <div class="sec-name">Discovery &amp; Research</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">What I actually<br><em>learned from PMs.</em></h2>
+    <p class="sp">I ran 8 semi-structured interviews over two weeks with 5 PMs through NYU's MOT program, 2 from my internship context, and 1 cold outreach at a B2B SaaS company. My goal was to understand <em>where time actually goes</em>, not validate a pre-existing hypothesis.</p>
+
+    <h3 class="sh3">Research Methodology</h3>
+    <div class="fwbox">
+      <div class="fwbox-hdr">// Interview Protocol</div>
+      <div class="fwbox-row"><div class="fwbox-key">Format</div><div class="fwbox-val">30 min Zoom, semi-structured. Started with <strong>"walk me through last Tuesday"</strong> - open-ended, no leading</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Sample</div><div class="fwbox-val">n=8. Mix: 3 mid-level PMs, 2 PM leads, 1 APM, 1 TPM, 1 startup founder-PM. All in B2B SaaS</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Analysis</div><div class="fwbox-val">Affinity mapping in FigJam. Clustered pain points, looked for Jobs-to-be-Done language</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Bias check</div><div class="fwbox-val">Asked "what's going <em>right</em> with your tools?" to avoid confirmation bias before hitting pain points</div></div>
+    </div>
+
+    <h3 class="sh3">Key Findings - What I Didn't Expect</h3>
+    <div class="grid2">
+      <div class="card r">
+        <span class="card-tag">Pain #1 - Most Common</span>
+        <h4>Status communication is the real killer</h4>
+        <p>7 of 8 PMs mentioned this unprompted. Writing the same project status for different audiences (engineering, leadership, sales, customers) took 3–5 hours/week.</p>
+      </div>
+      <div class="card r">
+        <span class="card-tag">Pain #2 - Most Nuanced</span>
+        <h4>Context loss is an invisible tax</h4>
+        <p>"Why did we decide X six months ago?" was a question PMs either couldn't answer or spent 20 minutes tracing through Slack and old docs to find.</p>
+      </div>
+      <div class="card o">
+        <span class="card-tag">Surprise Finding</span>
+        <h4>PMs don't want AI to replace them - they want a first draft</h4>
+        <p>When I asked "would you want AI to write your status updates automatically?", 6/8 said no - they feared losing their voice. But "would you want AI to draft it and you edit?" got unanimous yes.</p>
+      </div>
+      <div class="card v">
+        <span class="card-tag">Opportunity Unlocked</span>
+        <h4>Onboarding is 3–6 weeks of lost productivity</h4>
+        <p>New PMs spend their first month trying to understand why decisions were made. An AI that could answer "what's the context behind epic #247?" is immediately valuable.</p>
+      </div>
+    </div>
+
+    <h3 class="sh3">Jobs-to-be-Done Framework</h3>
+    <div class="fwbox">
+      <div class="fwbox-hdr">// Core Jobs to be Done</div>
+      <div class="fwbox-row"><div class="fwbox-key">Job 1</div><div class="fwbox-val">When I need to update stakeholders, help me <strong>communicate status without starting from scratch</strong>, so I don't lose 30 minutes writing the same thing I wrote last week.</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Job 2</div><div class="fwbox-val">When a stakeholder asks why we made a decision, help me <strong>surface the original rationale fast</strong>, so I don't spend an hour archaeology-ing through Slack.</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Job 3</div><div class="fwbox-val">When a new PM joins my team, help them <strong>understand our product context in days, not weeks</strong>, without interrupting the rest of the team constantly.</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Job 4</div><div class="fwbox-val">When engineering asks about roadmap priorities, help me <strong>answer confidently and consistently</strong> with cited specs.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 PROBLEM DEFINITION -->
+<section class="section" id="problem">
+  <div class="sec-lbl">
+    <div class="sec-idx">03</div>
+    <div class="sec-name">Problem Definition</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">The tools aren't broken.<br><em>They're blind.</em></h2>
+    <p class="sp">Jira, Notion, Confluence, and Slack are all good at tracking, documenting, and communicating. But none of them <strong>understand product context</strong>. They're static silos.</p>
+
+    <div class="grid2">
+      <div class="card r">
+        <span class="card-tag">Before - The Reality</span>
+        <ul>
+          <li>4–5 hrs/week writing status updates from scratch for different audiences</li>
+          <li>20+ minutes tracing a decision through Slack threads and old docs</li>
+          <li>3–6 weeks for a new PM to get full product context from the team</li>
+          <li>PM becomes the synchronous bottleneck for all stakeholder questions</li>
+          <li>Decision rationale decays - nobody remembers "why" after 3 months</li>
+        </ul>
+      </div>
+      <div class="card g">
+        <span class="card-tag">After - The Vision</span>
+        <ul>
+          <li>Draft generated in 90 seconds, PM reviews and edits for 5 minutes</li>
+          <li>Ask in plain English: "Why did we defer push notifications?" → instant answer with citations</li>
+          <li>New PMs query the AI on context, onboard 3x faster</li>
+          <li>Stakeholders get a self-serve portal for roadmap questions - no PM required</li>
+          <li>Every decision auto-logged with context, searchable forever</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="sh3">The Root Cause - Interactive Breakdown Frame</h3>
+    <div class="arch">
+      <div class="arch-hdr">
+        <div class="arch-hdr-title">// Where PM Time Goes (40h week)</div>
+        <div class="arch-hdr-badge">Based on n=8 interviews</div>
+      </div>
+      <div class="arch-body">
+        <div class="arch-row hot">
+          <div class="arch-icon"><i data-lucide="file-text" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Status updates &amp; stakeholder communication <span style="color:var(--muted)"> - writing, rewriting, adapting tone</span></div>
+          <div class="arch-badge v">~5 hrs/wk</div>
+        </div>
+        <div class="arch-row hot">
+          <div class="arch-icon"><i data-lucide="search" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Research archaeology <span style="color:var(--muted)"> - finding past decisions, old PRDs, why X was deprioritized</span></div>
+          <div class="arch-badge v">~3 hrs/wk</div>
+        </div>
+        <div class="arch-row hot">
+          <div class="arch-icon"><i data-lucide="mic" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Synchronous stakeholder Q&amp;A <span style="color:var(--muted)"> - answering questions already documented</span></div>
+          <div class="arch-badge v">~4 hrs/wk</div>
+        </div>
+        <div class="arch-conn">↓ 30–40% of total PM capacity, none of it strategic</div>
+        <div class="arch-row green">
+          <div class="arch-icon"><i data-lucide="sparkles" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Actual strategic PM work <span style="color:var(--muted)"> - discovery, prioritization, roadmap, user research</span></div>
+          <div class="arch-badge g">~20 hrs/wk</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 PERSONAS -->
+<section class="section" id="personas">
+  <div class="sec-lbl">
+    <div class="sec-idx">04</div>
+    <div class="sec-name">User Personas</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">Three users.<br><em>Three different trust levels.</em></h2>
+    <p class="sp">The PM will review everything before it goes out. The exec needs accountability. The stakeholder just wants an answer. Each needs a different interface and trust mechanism.</p>
+    <div class="grid3" style="margin-top:24px">
+      <div class="persona">
+        <div class="p-role">Primary User · Daily</div>
+        <div class="p-name">The PM</div>
+        <div class="p-title">Mid-level Product Manager</div>
+        <div class="p-section-lbl r">Core Pains</div>
+        <div class="p-items">
+          <div class="p-item pain">Status writing eats my Monday morning</div>
+          <div class="p-item pain">Can't find why we decided X six months ago</div>
+          <div class="p-item pain">I'm a human Jira-to-email converter</div>
+        </div>
+        <div class="p-section-lbl g">Jobs to be Done</div>
+        <div class="p-items">
+          <div class="p-item job">Draft stakeholder updates for my review</div>
+          <div class="p-item job">Surface past decisions on demand</div>
+          <div class="p-item job">Prep sprint reviews without manual assembly</div>
+        </div>
+        <div class="p-quote">"Give me a fast first draft. I'll make it sound like me."</div>
+      </div>
+      <div class="persona">
+        <div class="p-role">Secondary User · Weekly</div>
+        <div class="p-name">The PM Lead</div>
+        <div class="p-title">VP / Director of Product</div>
+        <div class="p-section-lbl r">Core Pains</div>
+        <div class="p-items">
+          <div class="p-item pain">How do I trust AI output without reviewing everything?</div>
+          <div class="p-item pain">New PM onboarding takes too long</div>
+          <div class="p-item pain">I need an audit trail if something goes wrong</div>
+        </div>
+        <div class="p-section-lbl g">Jobs to be Done</div>
+        <div class="p-items">
+          <div class="p-item job">Visibility into what AI is doing on my team</div>
+          <div class="p-item job">Onboard new PMs to context in days not weeks</div>
+          <div class="p-item job">Accountability layer for who approved what</div>
+        </div>
+        <div class="p-quote">"I need confidence this is accurate and that there's a human in the loop before anything goes out."</div>
+      </div>
+      <div class="persona">
+        <div class="p-role">Tertiary User · Ad Hoc</div>
+        <div class="p-name">The Stakeholder</div>
+        <div class="p-title">Eng Lead / Sales / CS Team</div>
+        <div class="p-section-lbl r">Core Pains</div>
+        <div class="p-items">
+          <div class="p-item pain">I don't know what's being built or when</div>
+          <div class="p-item pain">I have to Slack the PM for basic roadmap info</div>
+          <div class="p-item pain">I always feel like I'm interrupting</div>
+        </div>
+        <div class="p-section-lbl g">Jobs to be Done</div>
+        <div class="p-items">
+          <div class="p-item job">Self-serve answers to "what's the status of X?"</div>
+          <div class="p-item job">Understand why decisions were made</div>
+          <div class="p-item job">Track features relevant to my team</div>
+        </div>
+        <div class="p-quote">"I just need to know if feature X is still on track without having to set up a meeting."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 ARCHITECTURE -->
+<section class="section" id="architecture">
+  <div class="sec-lbl">
+    <div class="sec-idx">05</div>
+    <div class="sec-name">System Architecture</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">How I'd actually<br><em>build this.</em></h2>
+    <p class="sp">The co-pilot is a <strong>Retrieval-Augmented Generation (RAG)</strong> system that sits on top of your existing product stack, builds a permission-gated semantic index, and answers queries against that live index with citations.</p>
+
+    <div class="grid2">
+      <div class="card r">
+        <span class="card-tag">Fine-tuning - Why I Ruled It Out</span>
+        <p>Fine-tuning bakes a snapshot of your product context into model weights. When the roadmap changes next sprint, your model is out of date, and you can't point to the source of an answer.</p>
+      </div>
+      <div class="card g">
+        <span class="card-tag">RAG - Why It Fits</span>
+        <p>RAG retrieves live documents at query time. Every answer cites a specific source the PM can verify. Permission-gating happens at vector retrieval time, not just at the UI layer.</p>
+      </div>
+    </div>
+
+    <h3 class="sh3">Full System Architecture Frame</h3>
+    <div class="arch">
+      <div class="arch-hdr">
+        <div class="arch-hdr-title">// AI Product Ops Co-pilot · RAG Architecture</div>
+        <div class="arch-hdr-badge">Production System Frame</div>
+      </div>
+      <div class="arch-body">
+        <div class="arch-3">
+          <div class="arch-row"><div class="arch-icon"><i data-lucide="file-text" style="width:16px;height:16px"></i></div><div><div class="arch-name">Notion / Confluence</div><div class="arch-sub">PRDs, specs, research</div></div></div>
+          <div class="arch-row"><div class="arch-icon"><i data-lucide="layers" style="width:16px;height:16px"></i></div><div><div class="arch-name">Jira / Linear</div><div class="arch-sub">Tickets, sprints, epics</div></div></div>
+          <div class="arch-row"><div class="arch-icon"><i data-lucide="message-square" style="width:16px;height:16px"></i></div><div><div class="arch-name">Slack / Teams</div><div class="arch-sub">Decision threads, updates</div></div></div>
+        </div>
+        <div class="arch-conn">↓ Ingestion Pipeline - Chunking + Embedding + Metadata tagging</div>
+        <div class="arch-row hot">
+          <div class="arch-icon"><i data-lucide="cpu" style="width:16px;height:16px"></i></div>
+          <div class="arch-name">Vector Store (Pinecone / Weaviate)</div>
+          <div class="arch-sub" style="flex:1;padding-left:12px">Org-scoped, permission-gated per user role. Tagged with source, author, timestamp</div>
+          <div class="arch-badge v">Core Index</div>
+        </div>
+        <div class="arch-conn">↓ Query → Retrieve (top-K chunks) → Assemble with permission context</div>
+        <div class="arch-2">
+          <div class="arch-row hot"><div class="arch-icon"><i data-lucide="bot" style="width:16px;height:16px"></i></div><div><div class="arch-name">LLM (Claude Sonnet / GPT-4o)</div><div class="arch-sub">Stateless per call. Never stores org data.</div></div></div>
+          <div class="arch-row hot"><div class="arch-icon"><i data-lucide="search" style="width:16px;height:16px"></i></div><div><div class="arch-name">Context Assembler</div><div class="arch-sub">Ranks chunks, injects roadmap state + user ACL</div></div></div>
+        </div>
+        <div class="arch-conn">↓ Response with inline citations + confidence score</div>
+        <div class="arch-3">
+          <div class="arch-row cyan"><div class="arch-icon"><i data-lucide="pen-line" style="width:16px;height:16px"></i></div><div><div class="arch-name">PM Workspace</div><div class="arch-sub">Full output + edit mode</div></div></div>
+          <div class="arch-row cyan"><div class="arch-icon"><i data-lucide="bar-chart-2" style="width:16px;height:16px"></i></div><div><div class="arch-name">Lead Dashboard</div><div class="arch-sub">Audit log + approvals</div></div></div>
+          <div class="arch-row cyan"><div class="arch-icon"><i data-lucide="lock" style="width:16px;height:16px"></i></div><div><div class="arch-name">Stakeholder Portal</div><div class="arch-sub">Read-only Q&amp;A</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sh3">The Workflow - Step by Step</h3>
+    <div class="flow">
+      <div class="flow-step"><div class="fs-icon v"><i data-lucide="message-square" style="width:18px;height:18px"></i></div><div class="fs-lbl">1 - Query</div><div class="fs-desc">"Draft sprint 23 stakeholder update"</div></div>
+      <div class="flow-step"><div class="fs-icon v"><i data-lucide="search" style="width:18px;height:18px"></i></div><div class="fs-lbl">2 - Retrieve</div><div class="fs-desc">Vector search across Jira, Notion, Slack</div></div>
+      <div class="flow-step"><div class="fs-icon v"><i data-lucide="cpu" style="width:18px;height:18px"></i></div><div class="fs-lbl">3 - Assemble</div><div class="fs-desc">Context assembler ranks + filters by ACL</div></div>
+      <div class="flow-step"><div class="fs-icon c"><i data-lucide="pen-line" style="width:18px;height:18px"></i></div><div class="fs-lbl">4 - Generate</div><div class="fs-desc">LLM drafts with inline citations + confidence</div></div>
+      <div class="flow-step"><div class="fs-icon g"><i data-lucide="check-circle" style="width:18px;height:18px"></i></div><div class="fs-lbl">5 - PM Review</div><div class="fs-desc">Human edits, approves, sends. Always.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 UX DESIGN & INTERACTIVE CHAT FRAME -->
+<section class="section" id="ux">
+  <div class="sec-lbl">
+    <div class="sec-idx">06</div>
+    <div class="sec-name">UX &amp; Interactive Frame</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">Design for<br><em>humans reviewing AI,</em><br>not AI replacing humans.</h2>
+    <p class="sp">The co-pilot <em>always drafts</em>, the PM <em>always approves</em>. This is the product's core trust mechanism in an enterprise environment.</p>
+
+    <div class="grid3">
+      <div class="card v"><span class="card-tag">Principle 1</span><h4>AI drafts, humans send</h4><p>No output goes to any stakeholder without explicit PM approval. The "Send" action is always human-triggered.</p></div>
+      <div class="card v"><span class="card-tag">Principle 2</span><h4>Every answer has a source</h4><p>All AI responses surface inline citations with clickable links to the source Jira ticket, Slack thread, or PRD.</p></div>
+      <div class="card v"><span class="card-tag">Principle 3</span><h4>Uncertainty is visible</h4><p>The system shows a confidence score with every output based on corroborating retrieved sources.</p></div>
+    </div>
+
+    <h3 class="sh3">PM Interface - Interactive Workspace Frame</h3>
+    <div class="chat">
+      <div class="chat-hdr">PM Co-pilot Workspace · Roadmap Q4</div>
+      <div class="chat-msg">
+        <div class="chat-av u">SV</div>
+        <div>
+          <div class="chat-bubble">Draft the stakeholder update for this week's sprint. Include the notification system delay and the reason it slipped.</div>
+          <div class="chat-meta">Sai Shreyas · 2:14 PM</div>
+        </div>
+      </div>
+      <div class="chat-msg ai">
+        <div class="chat-av bot">AI</div>
+        <div style="max-width:84%">
+          <div class="chat-bubble bot" id="draftBubble">
+            <strong>Draft: Sprint 23 Stakeholder Update</strong><br><br>
+            This week's sprint completed 8 of 10 planned tickets. The Notification System (Epic #247) has been moved to Sprint 24 to address a third-party webhook reliability issue discovered during QA on Tuesday. The team made the call to defer rather than ship with a known intermittent failure. All other deliverables shipped as planned, including search indexing improvements (+23% query speed) and the user onboarding flow redesign.<br><br>
+            <em style="font-size:11px;color:var(--accent)">Confidence: High (94%) · 6 sources · Jira Sprint 23, Slack #eng-q3, Notion PRD-247</em>
+          </div>
+          <div class="chat-cite"><strong>Sources cited:</strong> Jira Sprint 23 board · Slack #product-updates (Tue 4:22PM) · Notification System PRD v2.1</div>
+          <div class="chat-actions">
+            <button class="chat-btn" onclick="setDraftMode('exec')">⚡ Executive 2-Line Summary</button>
+            <button class="chat-btn" onclick="setDraftMode('full')">📄 Full Stakeholder Draft</button>
+            <button class="chat-btn" onclick="setDraftMode('eng')">🔧 Engineering Release Note</button>
+          </div>
+          <div style="margin-top:10px"><span class="chat-badge">✓ Human-in-the-loop approval required before external send</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 SCOPING -->
+<section class="section" id="scoping">
+  <div class="sec-lbl">
+    <div class="sec-idx">07</div>
+    <div class="sec-name">MVP Scoping</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">What I'd actually<br><em>ship first.</em></h2>
+    <p class="sp">I applied MoSCoW to scope the MVP under realistic constraints: 8-week sprint, 2 engineers, 1 PM. Must use existing LLM APIs.</p>
+
+    <div class="fwbox">
+      <div class="fwbox-hdr">// MoSCoW - AI PM Co-pilot MVP</div>
+      <div class="fwbox-row"><div class="fwbox-key">Must Have</div><div class="fwbox-val"><strong>Status Update Drafter</strong> - generates a draft with cited sources, human approves before send. Proves core 40% time-saving value immediately.</div></div>
+      <div class="fwbox-row"><div class="fwbox-key">Must Have</div><div class="fwbox-val"><strong>Decision History Q&amp;A</strong> - PM can ask "why did we defer X?" and get an answer with a link to the source Slack thread or PRD.</div></div>
+      <div class="fwbox-row"><div class="fwbox-key" style="color:var(--accent2)">Should Have</div><div class="fwbox-val"><strong>Audit Log for PM Lead</strong> - dashboard showing all AI outputs, PM approvals, and flagged errors.</div></div>
+      <div class="fwbox-row"><div class="fwbox-key" style="color:var(--muted)">Could Have</div><div class="fwbox-val"><strong>Stakeholder Portal</strong> - ship in V2 once core PM workflow adoption is validated.</div></div>
+    </div>
+
+    <h3 class="sh3">Phased Roadmap</h3>
+    <div class="grid3">
+      <div class="phase mvp">
+        <div class="phase-lbl">MVP - Phase 1</div>
+        <h4>Prove the Core Loop</h4>
+        <div class="phase-dur">Weeks 1–8 · 2 Engineers</div>
+        <ul>
+          <li>Jira + Notion + Slack ingestion pipeline</li>
+          <li>Vector store setup (Pinecone, single org)</li>
+          <li>Status Update Drafter with citations</li>
+          <li>Decision History Q&amp;A</li>
+          <li>Internal beta with 3–5 PMs</li>
+        </ul>
+      </div>
+      <div class="phase v2">
+        <div class="phase-lbl" style="color:var(--accent2)">V2 - Phase 2</div>
+        <h4>Expand &amp; Validate Trust</h4>
+        <div class="phase-dur">Weeks 9–16 · 3 Engineers</div>
+        <ul>
+          <li>Stakeholder Portal (read-only Q&amp;A)</li>
+          <li>Role-based permission gating at vector level</li>
+          <li>PM Lead dashboard with quality metrics</li>
+          <li>Feedback loop for flagged outputs</li>
+        </ul>
+      </div>
+      <div class="phase future">
+        <div class="phase-lbl" style="color:var(--accent4)">V3+ - Future</div>
+        <h4>Scale &amp; Differentiate</h4>
+        <div class="phase-dur">Months 5–12</div>
+        <ul>
+          <li>Sprint review auto-generation</li>
+          <li>Multi-team and multi-org support</li>
+          <li>Confidence calibration &amp; hallucination evals</li>
+          <li>Custom LLM prompt library per org</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 METRICS & RICE -->
+<section class="section" id="metrics">
+  <div class="sec-lbl">
+    <div class="sec-idx">08</div>
+    <div class="sec-name">Metrics &amp; RICE</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">How I'd know<br><em>if this is working.</em></h2>
+    <div class="metrics">
+      <div class="met"><div class="met-l">North Star</div><div class="met-n">5 hrs</div><div class="met-d">Time saved per PM per week on operational writing (at 30 days)</div></div>
+      <div class="met"><div class="met-l">Adoption</div><div class="met-n c">70%</div><div class="met-d">PMs using co-pilot 3+ times/week at Day 90</div></div>
+      <div class="met"><div class="met-l">Quality</div><div class="met-n">&lt;3%</div><div class="met-d">Flagged hallucinations / total outputs in audit log</div></div>
+      <div class="met"><div class="met-l">Onboarding</div><div class="met-n o">60%</div><div class="met-d">Reduction in new PM ramp time (3 wks → ~1 wk)</div></div>
+    </div>
+
+    <h3 class="sh3">RICE Prioritization - MVP Features</h3>
+    <table class="rice-table">
+      <thead>
+        <tr><th>Feature</th><th>Reach</th><th>Impact</th><th>Conf.</th><th>Effort</th><th>Score</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Status Update Drafter</td><td>All PMs (100%)</td><td>4/4</td><td>88%</td><td>4 wks</td><td><span class="rice-score hi">88</span></td><td>Highest daily friction. 7/8 interview subjects mentioned this unprompted.</td></tr>
+        <tr><td>Decision History Q&amp;A</td><td>All PMs + New hires</td><td>3/4</td><td>80%</td><td>3 wks</td><td><span class="rice-score hi">80</span></td><td>Core onboarding unlock. Proven RAG pattern.</td></tr>
+        <tr><td>PM Lead Audit Dashboard</td><td>PM Leads (20%)</td><td>3/4</td><td>75%</td><td>2 wks</td><td><span class="rice-score md">56</span></td><td>Critical for enterprise adoption &amp; governance approval.</td></tr>
+        <tr><td>Sprint Review Generator</td><td>All PMs (100%)</td><td>2/4</td><td>60%</td><td>3 wks</td><td><span class="rice-score lo">40</span></td><td>Bi-weekly use only. V2 candidate.</td></tr>
+        <tr><td>Stakeholder Portal</td><td>All teams</td><td>3/4</td><td>65%</td><td>5 wks</td><td><span class="rice-score lo">39</span></td><td>High IAM scope risk. Defer to V2 once core PM loop is proven.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 09 LEARNINGS -->
+<section class="section" id="learnings">
+  <div class="sec-lbl">
+    <div class="sec-idx">09</div>
+    <div class="sec-name">What I Learned</div>
+  </div>
+  <div class="sec-body">
+    <h2 class="sh">What building this<br><em>actually taught me.</em></h2>
+    <div class="lr"><div class="lr-n">01</div><div><div class="lr-h">Trust is a product feature, not a disclaimer</div><div class="lr-d">Trust in B2B AI is earned through mechanisms: visible citations, editable outputs, human gates before any external send, and audit trails accessible to leadership.</div></div></div>
+    <div class="lr"><div class="lr-n">02</div><div><div class="lr-h">My first scope was 4x too big</div><div class="lr-d">My original doc had 12 features in the MVP. After applying MoSCoW honestly, I cut it to 2: Status Update Drafter + Decision History Q&amp;A.</div></div></div>
+    <div class="lr"><div class="lr-n">03</div><div><div class="lr-h">Architecture decisions are PM decisions</div><div class="lr-d">Choosing RAG over fine-tuning determines your accuracy maintenance costs, data privacy posture, explainability, and staleness when the roadmap changes.</div></div></div>
+    <div class="lr"><div class="lr-n">04</div><div><div class="lr-h">The "PM as editor" model unlocked adoption thinking</div><div class="lr-d">Framing the co-pilot as "AI that drafts, PM that edits" turned PMs who feared being replaced into PMs excited about getting their Monday mornings back.</div></div></div>
+  </div>
+</section>
+
+</div>
+
+<!-- CASE NAV FOOTER -->
+<div class="cnav">
+  <a href="multitenant.html" class="cnav-half" data-go="multitenant.html">
+    <div>
+      <div class="cn-dir">← Previous Case Study</div>
+      <div class="cn-h">Multi-Tenant Systems</div>
+      <div class="cn-d">Architecture decisions that define what PMs can ever ship in B2B SaaS.</div>
+    </div>
+    <div class="cn-btn">← Case 001</div>
+  </a>
+  <a href="index.html" class="cnav-half" data-go="index.html">
+    <div>
+      <div class="cn-dir">Back to Main Portfolio</div>
+      <div class="cn-h">All Case Studies &amp; Shipped Work</div>
+      <div class="cn-d">Explore Arcus, TruVideo, ML Fraud Pipeline, and full PM portfolio.</div>
+    </div>
+    <div class="cn-btn">Portfolio Home →</div>
+  </a>
+</div>
+
+<script>
+const bar = document.getElementById('prog');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  bar.style.width = Math.min(pct, 100) + '%';
+}, { passive: true });
+
+function setDraftMode(mode) {
+  const bubble = document.getElementById('draftBubble');
+  if (mode === 'exec') {
+    bubble.innerHTML = `<strong>Executive Summary (2-Line):</strong><br><br>• <strong>Velocity:</strong> 8/10 Sprint 23 stories shipped (+23% search query speed, onboarding redesign live).<br>• <strong>Risk &amp; Mitigation:</strong> Notification System (Epic #247) deferred to Sprint 24 to resolve a 3rd-party webhook reliability defect found in Tuesday QA.<br><br><em style="font-size:11px;color:var(--accent)">Confidence: High (94%) · 6 sources cited</em>`;
+  } else if (mode === 'eng') {
+    bubble.innerHTML = `<strong>Engineering Release Note (Sprint 23):</strong><br><br>• Merged search indexing pipeline optimization (+23% p95 query throughput).<br>• Held Epic #247 (Webhook dispatcher) behind feature flag due to intermittent 502s in staging QA; retry backoff scheduled for Sprint 24.<br><br><em style="font-size:11px;color:var(--accent)">Confidence: High (96%) · Jira Sprint 23 + GitHub PR #412</em>`;
+  } else {
+    bubble.innerHTML = `<strong>Draft: Sprint 23 Stakeholder Update</strong><br><br>This week's sprint completed 8 of 10 planned tickets. The Notification System (Epic #247) has been moved to Sprint 24 to address a third-party webhook reliability issue discovered during QA on Tuesday. The team made the call to defer rather than ship with a known intermittent failure. All other deliverables shipped as planned, including search indexing improvements (+23% query speed) and the user onboarding flow redesign.<br><br><em style="font-size:11px;color:var(--accent)">Confidence: High (94%) · 6 sources · Jira Sprint 23, Slack #eng-q3, Notion PRD-247</em>`;
+  }
+}
+
+function goTo(href) {
+  const pt = document.getElementById('pt');
+  pt.classList.add('go');
+  pt.style.pointerEvents = 'all';
+  setTimeout(() => window.location.href = href, 480);
+}
+document.querySelectorAll('[data-go]').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    goTo(el.getAttribute('data-go'));
+  });
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>

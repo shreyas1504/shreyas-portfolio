@@ -1,0 +1,3611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sai Shreyas - Builder PM · Product Manager</title>
+<meta name="description" content="Sai Shreyas Vyamajala - Builder PM & Technical Product Manager. NYU Tandon MS Management of Technology '27.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #070809;
+    --surface: #111317;
+    --surface2: #171a20;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 107, 43, 0.32);
+    --text: #ffffff;
+    --text-sec: #d5d9e0;
+    --muted: #949ba6;
+    --accent: #ff6b2b;
+    --accent-dim: rgba(255, 107, 43, 0.12);
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'Geist Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent); color: #070809; }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #262930; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ── PAGE TRANSITION CURTAIN ── */
+  #pt-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    pointer-events: none;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  #pt-curtain.pt-entering {
+    clip-path: inset(0 0 0% 0);
+    pointer-events: all;
+  }
+  .pt-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .pt-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    padding: 0 2rem;
+  }
+
+  /* ── FLOATING PILL NAVBAR (EXACT BOLDEX DEMO DESIGN + SCROLL INDICATOR) ── */
+  .nav-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    display: flex;
+    justify-content: center;
+    padding: 0 1.25rem;
+    pointer-events: none;
+    transition: top 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-wrapper.scrolled-wrap {
+    top: 12px;
+  }
+  nav.boldex-nav {
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+    width: 100%;
+    max-width: 1040px;
+    background: rgba(26, 28, 34, 0.85);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    padding: 0.48rem 0.6rem 0.48rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  nav.boldex-nav.is-scrolled {
+    background: rgba(16, 18, 23, 0.93);
+    border-color: rgba(255, 107, 43, 0.32);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.78), 0 0 28px rgba(255, 107, 43, 0.12);
+  }
+  .nav-scroll-progress {
+    position: absolute;
+    bottom: 0;
+    left: 18px;
+    right: 18px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 999px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .nav-scroll-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #ffb088);
+    box-shadow: 0 0 10px var(--accent);
+    transition: width 0.08s linear;
+  }
+  .nav-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .nav-avatar-ring {
+    width: 44px;
+    height: 44px;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--accent), rgba(255, 107, 43, 0.25));
+    clip-path: polygon(25% 5%, 75% 5%, 98% 50%, 75% 95%, 25% 95%, 2% 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    clip-path: polygon(25% 5%, 75% 5%, 98% 50%, 75% 95%, 25% 95%, 2% 50%);
+    background: #12151a;
+  }
+  .nav-profile-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .nav-profile-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.94rem;
+    color: var(--text);
+  }
+  .nav-profile-role {
+    font-size: 0.73rem;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: color 0.25s ease;
+  }
+  .nav-profile-role .nav-sec-badge {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+  }
+  .nav-links {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    background: rgba(255, 255, 255, 0.025);
+    padding: 0.22rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .nav-indicator-pill {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: rgba(255, 107, 43, 0.16);
+    border: 1px solid rgba(255, 107, 43, 0.48);
+    box-shadow: 0 0 16px rgba(255, 107, 43, 0.22);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+      width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.25s ease;
+    z-index: 0;
+  }
+  .nav-links li {
+    position: relative;
+    z-index: 1;
+  }
+  .nav-links a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.36rem;
+    color: var(--text-sec);
+    text-decoration: none;
+    font-size: 0.83rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    transition: color 0.22s ease, background 0.22s ease;
+    white-space: nowrap;
+  }
+  .nav-links a::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .nav-links a:hover {
+    color: var(--text);
+  }
+  .nav-links a.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .nav-links a.active::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+    background: var(--accent);
+    color: #070809;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.84rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    padding: 0.4rem 1.25rem 0.4rem 0.4rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .nav-cta-circle {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #070809;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .nav-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255, 107, 43, 0.35);
+  }
+  .nav-cta:hover .nav-cta-circle {
+    transform: translateX(2px);
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-shrink: 0;
+  }
+  .nav-actions .btn-glass-pill {
+    white-space: nowrap;
+    padding: 0.55rem 1rem;
+    font-size: 0.78rem;
+    line-height: 1;
+  }
+  .nav-profile { flex-shrink: 0; }
+  .nav-profile-role { white-space: nowrap; }
+
+  /* ── CONTAINER & SECTIONS ── */
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1.75rem;
+  }
+  section {
+    padding: 6rem 0;
+    position: relative;
+  }
+  .section-head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 3.5rem;
+  }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 3.9vw, 3.15rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin-bottom: 0.85rem;
+  }
+  .section-head h2 .accent {
+    color: var(--accent);
+  }
+  .section-head p {
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  /* ── HERO SECTION (CLEAN CUTOUT ON GEOMETRIC PAGE BACKGROUND) ── */
+  #hero {
+    padding: 8.5rem 0 3.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Boldex architectural geometric wireframe lines in the hero background (matching Framer link clarity) */
+  .hero-bg-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(255, 107, 43, 0.22) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 107, 43, 0.22) 1px, transparent 1px),
+      linear-gradient(135deg, rgba(255, 107, 43, 0.15) 1px, transparent 1px),
+      linear-gradient(45deg, rgba(255, 107, 43, 0.12) 1px, transparent 1px);
+    background-size: 140px 140px, 140px 140px, 140px 140px, 280px 280px;
+    mask-image:
+      radial-gradient(ellipse 95% 88% at 50% 48%, #000 42%, rgba(0,0,0,0.65) 72%, transparent 96%),
+      linear-gradient(to bottom, #000 0%, #000 82%, transparent 100%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      radial-gradient(ellipse 95% 88% at 50% 48%, #000 42%, rgba(0,0,0,0.65) 72%, transparent 96%);
+  }
+  .hero-ambient-glow {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(620px circle at 28% 42%, rgba(255, 107, 43, 0.16) 0%, transparent 68%),
+      radial-gradient(560px circle at 74% 52%, rgba(255, 107, 43, 0.18) 0%, transparent 66%),
+      radial-gradient(380px circle at 8% 18%, rgba(255, 107, 43, 0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-left {
+    max-width: 520px;
+  }
+  .hero-avail-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: rgba(19, 23, 28, 0.9);
+    border: 1px solid rgba(255, 107, 43, 0.2);
+    border-radius: 999px;
+    padding: 0.44rem 1.05rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-sec);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 25px rgba(255, 107, 43, 0.08);
+  }
+  .hero-avail-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.7rem, 4.8vw, 4.1rem);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin-bottom: 1.2rem;
+  }
+  .hero-desc {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 460px;
+  }
+  .hero-ctas {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+  .btn-boldex-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: var(--accent);
+    color: #070809;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.42rem 1.35rem 0.42rem 0.45rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-boldex-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #14171c;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+    transition: transform 0.2s ease;
+  }
+  .btn-boldex-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(255, 107, 43, 0.32);
+  }
+  .btn-boldex-pill:hover .btn-boldex-circle {
+    transform: translateX(3px);
+  }
+  .btn-glass-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    color: var(--text-sec);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.76rem 1.35rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-glass-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Monochrome Organization Row under Hero Left */
+  .hero-logos-strip {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    opacity: 0.68;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 88%, transparent 100%);
+  }
+  .hero-logo-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text-sec);
+  }
+  .hero-logo-item svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* Hero Right: True Transparent Cutout Portrait + Floating Glass Orbs */
+  .hero-right {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .hero-portrait-stage {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+  }
+  .hero-portrait-stage::before {
+    content: '';
+    position: absolute;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 440px;
+    height: 440px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 107, 43, 0.22) 0%, rgba(255, 107, 43, 0.08) 42%, transparent 72%);
+    filter: blur(22px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-portrait-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+    display: block;
+    /* Transparent PNG sits directly on the page background with zero solid box */
+    filter: contrast(1.04) brightness(1.04) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65));
+    image-rendering: -webkit-optimize-contrast;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* Floating 3D Glass Orbs */
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, rgba(58, 65, 78, 0.85), rgba(18, 21, 26, 0.94));
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 14px 32px rgba(0, 0, 0, 0.65),
+      inset 0 2px 4px rgba(255, 255, 255, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e6e9ef;
+    backdrop-filter: blur(10px);
+    z-index: 4;
+  }
+  .hero-orb svg { width: 48%; height: 48%; stroke-width: 1.75; }
+  .orb-1 { width: 52px; height: 52px; top: 15%; left: 10%; transform: rotate(-14deg); animation: orbFloat1 5.5s ease-in-out infinite; }
+  .orb-2 { width: 58px; height: 58px; top: 42%; left: 3%; transform: rotate(8deg); animation: orbFloat2 6.2s ease-in-out infinite; }
+  .orb-3 { width: 42px; height: 42px; top: 9%; right: 14%; transform: rotate(16deg); animation: orbFloat1 4.8s ease-in-out infinite reverse; }
+  .orb-4 { width: 62px; height: 62px; top: 35%; right: 3%; transform: rotate(-12deg); animation: orbFloat2 5.8s ease-in-out infinite 0.6s; }
+  @keyframes orbFloat1 {
+    0%, 100% { transform: translateY(0px) rotate(-14deg); }
+    50% { transform: translateY(-8px) rotate(-8deg); }
+  }
+  @keyframes orbFloat2 {
+    0%, 100% { transform: translateY(0px) rotate(8deg); }
+    50% { transform: translateY(-10px) rotate(14deg); }
+  }
+
+  /* Rotating Circular Stamp Badge */
+  .hero-stamp-badge {
+    position: absolute;
+    bottom: 6%;
+    right: 4%;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(14, 16, 20, 0.72);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+  .hero-stamp-ring {
+    width: 108px;
+    height: 108px;
+    animation: spinSlow 18s linear infinite;
+  }
+  .hero-stamp-ring text {
+    font-family: var(--font-mono);
+    font-size: 9.2px;
+    font-weight: 600;
+    fill: #e2e6ee;
+    letter-spacing: 2.3px;
+    text-transform: uppercase;
+  }
+  .hero-stamp-center {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(255, 107, 43, 0.24), rgba(18, 21, 26, 0.92));
+    border: 1px solid rgba(255, 107, 43, 0.45);
+    box-shadow: 0 0 18px rgba(255, 107, 43, 0.28), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+  .hero-stamp-badge:hover .hero-stamp-center {
+    transform: scale(1.12);
+    box-shadow: 0 0 26px rgba(255, 107, 43, 0.48);
+  }
+  @keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── EXACT BOLDEX 5-CARD WIDGET BENTO GRID (MATCHING SCREENSHOT 1:1) ── */
+  .boldex-bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.35rem;
+  }
+  .bx-card {
+    background-color: #111317;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(255, 107, 43, 0.14) 0%, transparent 52%),
+      radial-gradient(rgba(255, 107, 43, 0.12) 1px, transparent 1px);
+    background-size: 100% 100%, 16px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 24px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .bx-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+  }
+
+  /* Exact Grid Spans from Screenshot */
+  .bx-tall-left {
+    grid-column: span 5;
+    grid-row: span 2;
+    min-height: 540px;
+  }
+  .bx-top-right {
+    grid-column: span 7;
+    min-height: 260px;
+  }
+  .bx-mid-right {
+    grid-column: span 7;
+    min-height: 260px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: 1rem;
+  }
+  .bx-bot-left {
+    grid-column: span 6;
+    min-height: 280px;
+  }
+  .bx-bot-right {
+    grid-column: span 6;
+    min-height: 280px;
+  }
+
+  .bx-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
+  }
+  .bx-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .bx-title {
+    font-family: var(--font-display);
+    font-size: 1.32rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+  .bx-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.62;
+    max-width: 440px;
+  }
+
+  /* Visual Graphic 1 (Tall Left Card: Global Companies Pill + Concentric Avatar Ring + Send Bar) */
+  .bx-v1-wrap {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+  }
+  .bx-v1-glass-box {
+    background: rgba(24, 27, 33, 0.85);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 1.1rem 1.4rem;
+    text-align: center;
+    width: 100%;
+    max-width: 290px;
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.5);
+  }
+  .bx-v1-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-bottom: 0.65rem;
+    color: #ffffff;
+  }
+  .bx-v1-icons span {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.88rem;
+    opacity: 0.9;
+  }
+  .bx-v1-caption {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-sec);
+  }
+  .bx-v1-avatars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    width: 100%;
+  }
+  .bx-av-small {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #1e222a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.76rem;
+    color: var(--text-sec);
+    flex-shrink: 0;
+  }
+  .bx-av-center-rings {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 107, 43, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 30px rgba(255, 107, 43, 0.18);
+  }
+  .bx-av-center-rings::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 107, 43, 0.65);
+  }
+  .bx-av-center-rings img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 2px solid var(--accent);
+  }
+  .bx-v1-input {
+    width: 100%;
+    max-width: 290px;
+    background: rgba(24, 27, 33, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 999px;
+    padding: 0.68rem 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .bx-v1-input .send {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Visual Graphic 2 (Top Right Card: Overlapping Circular Orbs Cluster at Bottom) */
+  .bx-v2-bubbles {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.65rem;
+    margin-top: 1.35rem;
+    padding-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .bx-bubble {
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+  }
+  .bx-bubble.b-light {
+    width: 78px;
+    height: 78px;
+    background: radial-gradient(circle at 30% 30%, #262b35, #15181f);
+    color: var(--text);
+  }
+  .bx-bubble.b-accent {
+    width: 96px;
+    height: 96px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 107, 43, 0.24), rgba(28, 20, 17, 0.95));
+    border-color: rgba(255, 107, 43, 0.4);
+  }
+  .bx-bubble.b-dark {
+    width: 82px;
+    height: 82px;
+    background: #1b1e25;
+    color: var(--muted);
+  }
+  .bx-bubble strong {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .bx-bubble span {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--muted);
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Visual Graphic 3 (Mid Right Card: Concentric Radar Rings + Glowing Green Nodes) */
+  .bx-v3-radar {
+    position: relative;
+    width: 210px;
+    height: 210px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .radar-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .radar-ring.r1 { width: 205px; height: 205px; }
+  .radar-ring.r2 { width: 150px; height: 150px; }
+  .radar-ring.r3 { width: 96px; height: 96px; }
+  .radar-center {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #070809;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 32px rgba(255, 107, 43, 0.65);
+    z-index: 2;
+  }
+  .radar-node {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ff8f5c;
+    color: #070809;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    box-shadow: 0 0 14px rgba(255, 107, 43, 0.45);
+  }
+  .radar-node.n1 { top: 14px; left: 42px; }
+  .radar-node.n2 { top: 22px; right: 18px; width: 34px; height: 34px; }
+  .radar-node.n3 { bottom: 38px; left: 8px; }
+  .radar-node.n4 { bottom: 8px; left: 52px; }
+  .radar-node.n5 { bottom: 26px; right: 24px; }
+
+  /* Visual Graphic 4 & 5 (Bottom 2 Cards: Sleek Liquid Glass Mini Surface) */
+  .bx-v4-surface {
+    margin-top: 1.5rem;
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .bx-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 1.35rem;
+  }
+  .bx-mini-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: var(--text-sec);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.36rem 0.75rem;
+    border-radius: 999px;
+  }
+  .bx-mini-pill.hi {
+    background: var(--accent-dim);
+    border-color: rgba(255, 107, 43, 0.3);
+    color: var(--accent);
+  }
+
+  /* ── LIQUID GLASS IFRAME SHOWCASE CARDS ("SEE HOW I HELPED...") ── */
+  .iframe-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+  .liquid-glass-card {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.055) 0%, rgba(17, 19, 24, 0.88) 100%);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    border-radius: 26px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .liquid-glass-card:hover {
+    border-color: rgba(255, 107, 43, 0.38);
+    transform: translateY(-4px);
+  }
+
+  /* Liquid Glass Iframe Window Bezel */
+  .lg-window {
+    background: #090a0d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 360px;
+    position: relative;
+  }
+  .lg-topbar {
+    background: rgba(24, 27, 34, 0.9);
+    backdrop-filter: blur(12px);
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .lg-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .lg-dots span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .lg-dots span:nth-child(1) { background: #ff5f57; }
+  .lg-dots span:nth-child(2) { background: #febc2e; }
+  .lg-dots span:nth-child(3) { background: #28c840; }
+  .lg-url {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 0.22rem 0.75rem;
+    border-radius: 999px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lg-expand-btn {
+    background: var(--accent-dim);
+    border: 1px solid rgba(255, 107, 43, 0.3);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    padding: 0.24rem 0.65rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lg-expand-btn:hover {
+    background: var(--accent);
+    color: #070809;
+  }
+  .lg-iframe-wrap {
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: #0b0c0e;
+  }
+  .lg-iframe-wrap iframe {
+    width: 133.33%;
+    height: 133.33%;
+    border: 0;
+    transform: scale(0.75);
+    transform-origin: 0 0;
+  }
+
+  .lg-footer {
+    padding: 0.25rem 0.4rem 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .lg-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .lg-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(255, 107, 43, 0.25);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+  }
+  .lg-title {
+    font-family: var(--font-display);
+    font-size: 1.38rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+  .lg-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .lg-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+  }
+
+  /* Compact 3-Card Row for Shipped Engineering Projects */
+  .shipped-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.35rem;
+    margin-top: 1.75rem;
+  }
+  .shipped-card {
+    position: relative;
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 1.65rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.15rem;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .shipped-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+  }
+  .shipped-card h4 {
+    font-family: var(--font-display);
+    font-size: 1.18rem;
+    font-weight: 500;
+    letter-spacing: -0.028em;
+    color: var(--text);
+    margin: 0.45rem 0;
+  }
+  .shipped-card p {
+    font-size: 0.86rem;
+    color: var(--muted);
+    line-height: 1.62;
+  }
+  .shipped-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .shipped-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+  }
+  .gh-pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    padding: 0.38rem 0.82rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease, transform 0.22s ease;
+    position: relative;
+    z-index: 3;
+  }
+  .gh-pill-link:hover {
+    background: rgba(255, 107, 43, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .gh-pill-link.live {
+    background: rgba(255, 107, 43, 0.14);
+    border-color: rgba(255, 107, 43, 0.42);
+    color: var(--accent);
+  }
+  .gh-pill-link.live:hover {
+    background: var(--accent);
+    color: #070809;
+  }
+  .gh-pill-link svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  /* ── BOLDEX "FROM CONCEPT TO COMPLETION" FLOWCHART + 2X2 SHOWCASE CARD ── */
+  .concept-completion-card {
+    position: relative;
+    background-color: #111317;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(255, 107, 43, 0.22) 0%, rgba(255, 107, 43, 0.05) 28%, transparent 55%),
+      radial-gradient(rgba(255, 107, 43, 0.26) 1.25px, transparent 1.25px);
+    background-size: 100% 100%, 20px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 28px;
+    padding: 4rem 4rem;
+    display: grid;
+    grid-template-columns: 0.85fr 1.35fr;
+    gap: 3.5rem;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55);
+  }
+  /* Fade the dot matrix so it only appears in the top-left corner like Boldex */
+  .concept-completion-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 8% 12%, transparent 0%, #111317 42%),
+      repeating-radial-gradient(
+        circle at 82% 88%,
+        rgba(255, 255, 255, 0.018) 0px,
+        rgba(255, 255, 255, 0.018) 1px,
+        transparent 1px,
+        transparent 38px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cc-flowchart,
+  .cc-right-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Left Column: Vertical 4-Pill Flowchart */
+  .cc-flowchart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .cc-pill-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 268px;
+    padding: 0.6rem 1.35rem 0.6rem 0.65rem;
+    background: linear-gradient(180deg, rgba(32, 36, 44, 0.92) 0%, rgba(21, 24, 30, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 999px;
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.48),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .cc-pill-node:hover,
+  .cc-pill-node.active {
+    transform: translateY(-2px) scale(1.03);
+    border-color: rgba(255, 107, 43, 0.55);
+    box-shadow:
+      0 14px 32px rgba(0, 0, 0, 0.6),
+      0 0 24px rgba(255, 107, 43, 0.22),
+      inset 0 1px 0 rgba(255, 107, 43, 0.25);
+  }
+  .cc-pill-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #171a21;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-sec);
+    flex-shrink: 0;
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  }
+  .cc-pill-node:hover .cc-pill-icon,
+  .cc-pill-node.active .cc-pill-icon {
+    color: var(--accent);
+    border-color: rgba(255, 107, 43, 0.45);
+    background: rgba(255, 107, 43, 0.12);
+  }
+  .cc-pill-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+  .cc-pill-label {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  /* Dashed Connector Arrow Between Pills */
+  .cc-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 54px;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+  .cc-connector-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .cc-connector-line {
+    flex: 1;
+    width: 2px;
+    margin: 3px 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--accent) 0px,
+      var(--accent) 5px,
+      transparent 5px,
+      transparent 9px
+    );
+    opacity: 0.85;
+  }
+  .cc-connector-arrow {
+    color: var(--accent);
+    width: 14px;
+    height: 14px;
+    margin-top: -4px;
+    filter: drop-shadow(0 0 6px rgba(255, 107, 43, 0.55));
+  }
+
+  /* Right Column: Header + 2x2 Steps Grid */
+  .cc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 2.5rem;
+  }
+  .cc-header-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--accent);
+    filter: drop-shadow(0 0 10px rgba(255, 107, 43, 0.45));
+    flex-shrink: 0;
+  }
+  .cc-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.55rem, 2.5vw, 2.05rem);
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.038em;
+    margin: 0;
+  }
+  .cc-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.35rem 2.75rem;
+  }
+  .cc-step-item {
+    padding: 0.85rem 1rem;
+    margin: -0.85rem -1rem;
+    border-radius: 18px;
+    border: 1px solid transparent;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+  }
+  .cc-step-item:hover,
+  .cc-step-item.active {
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(255, 107, 43, 0.28);
+    transform: translateY(-2px);
+  }
+  .cc-step-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #1c2026;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-sec);
+    margin-bottom: 1.15rem;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .cc-step-item:hover .cc-step-badge,
+  .cc-step-item.active .cc-step-badge {
+    background: rgba(255, 107, 43, 0.16);
+    color: var(--accent);
+    border-color: rgba(255, 107, 43, 0.5);
+    box-shadow: 0 0 18px rgba(255, 107, 43, 0.25);
+  }
+  .cc-step-item h4 {
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.028em;
+  }
+  .cc-step-item p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.62;
+    margin: 0;
+  }
+
+  @media (max-width: 980px) {
+    .concept-completion-card {
+      grid-template-columns: 1fr;
+      padding: 2.5rem 1.75rem;
+      gap: 2.5rem;
+    }
+    .cc-steps-grid {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+  }
+
+
+  /* ── MEET YOUR PM ("HEY, I'M SAI SHREYAS" + BIG COUNTERS + LIQUID GLASS RESUME) ── */
+  .about-split {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  .about-copy h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 3.2vw, 2.6rem);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    letter-spacing: -0.038em;
+  }
+  .about-copy p {
+    color: var(--muted);
+    font-size: 0.96rem;
+    line-height: 1.75;
+    margin-bottom: 1.1rem;
+  }
+  .about-copy p strong { color: var(--text); }
+
+  .boldex-counters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .bx-counter {
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.25rem;
+  }
+  .bx-counter-num {
+    font-family: var(--font-display);
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .bx-counter-num span { color: var(--accent); }
+  .bx-counter-lbl {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.35rem;
+  }
+
+  /* Compact Experience Pills */
+  .exp-mini-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .exp-mini-row {
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.85rem 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.86rem;
+  }
+  .exp-mini-row strong { color: var(--text); font-family: var(--font-display); }
+  .exp-mini-row span.role { color: var(--muted); }
+  .exp-mini-row span.date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── BOLDEX FAQ ACCORDION ("COMMONLY ASKED QUESTIONS") ── */
+  .faq-stack {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .faq-item {
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .faq-item.open { border-color: var(--border-hover); }
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    padding: 1.15rem 1.4rem;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .faq-icon {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    transition: transform 0.25s;
+  }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease;
+  }
+  .faq-a-inner {
+    padding: 0 1.4rem 1.25rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.68;
+  }
+
+  /* ── BOLDEX CTA FOOTER BANNER ("LET'S BUILD SOMETHING AMAZING!") ── */
+  .cta-banner {
+    background-color: #111317;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(255, 107, 43, 0.16) 0%, transparent 60%),
+      radial-gradient(rgba(255, 107, 43, 0.1) 1px, transparent 1px);
+    background-size: 100% 100%, 18px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 28px;
+    padding: 4rem 2.5rem;
+    text-align: center;
+  }
+  .cta-banner h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1.16;
+    margin-bottom: 0.85rem;
+  }
+  .cta-banner p {
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 2rem;
+    font-size: 0.96rem;
+  }
+  .contact-pills {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  .contact-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-sec);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    transition: all 0.2s;
+  }
+  .contact-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  footer {
+    padding: 2rem 0 3rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* ── FULLSCREEN LIQUID GLASS IFRAME MODAL ── */
+  .iframe-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(5, 6, 8, 0.82);
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .iframe-modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .iframe-modal-window {
+    width: 100%;
+    max-width: 1180px;
+    height: 88vh;
+    background: rgba(17, 19, 23, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 22px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.8);
+  }
+  .im-topbar {
+    background: rgba(24, 27, 34, 0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .im-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-sec);
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .im-actions { display: flex; gap: 0.5rem; }
+  .im-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: var(--text-sec);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.38rem 0.85rem;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .im-btn.primary {
+    background: var(--accent);
+    color: #070809;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .im-frame { width: 100%; flex: 1; border: 0; background: #0b0c0e; }
+
+  /* ── TOP SCROLL LASER PROGRESS BAR ── */
+  #scroll-laser {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #ff6b2b, #ff9f68);
+    box-shadow: 0 0 14px rgba(255, 107, 43, 0.85);
+    z-index: 9999;
+    pointer-events: none;
+    transition: width 0.08s linear;
+  }
+
+  /* ── INTERACTIVE CURSOR SPOTLIGHT GLOW ON CARDS ── */
+  .bx-card::after,
+  .liquid-glass-card::after,
+  .shipped-card::after,
+  .concept-completion-card::after,
+  .phi-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 107, 43, 0.13),
+      transparent 45%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+  .bx-card:hover::after,
+  .liquid-glass-card:hover::after,
+  .shipped-card:hover::after,
+  .concept-completion-card:hover::after,
+  .phi-card:hover::after {
+    opacity: 1;
+  }
+
+  /* ── VERBATIM ABOUT SECTION STYLING (BOLDEX DARK + LIQUID GLASS) ── */
+  .about-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .about-main-heading {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 3.9vw, 3.15rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin-bottom: 2.75rem;
+  }
+  .about-grid-verbatim {
+    display: grid;
+    grid-template-columns: 1.25fr 0.85fr;
+    gap: 3rem;
+    align-items: start;
+  }
+  .about-text-col p {
+    color: var(--text-sec);
+    font-size: 0.97rem;
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+  .about-text-col p strong { color: var(--text); font-weight: 600; }
+  .about-text-col p em { color: var(--accent); font-style: italic; }
+
+  /* 3-Column Skills Block from Existing Portfolio */
+  .skills-3-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+  .sk-col-head {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .sk-item {
+    font-size: 0.84rem;
+    color: var(--text-sec);
+    padding: 0.26rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .sk-item::before {
+    content: '•';
+    color: var(--accent);
+  }
+
+  /* Verbatim 5-Row Timeline */
+  .tl-verbatim {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-top: 1.75rem;
+  }
+  .tl-v-row {
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.25rem 1.45rem;
+    display: grid;
+    grid-template-columns: 135px 1fr;
+    gap: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .tl-v-date {
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    color: var(--accent);
+    font-weight: 600;
+    padding-top: 0.15rem;
+  }
+  .tl-v-title {
+    font-family: var(--font-display);
+    font-size: 1.04rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .tl-v-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* Right Sticky Column: Photo + 4 Stat Cards + Liquid Glass Shreyas Resume */
+  .about-right-sticky {
+    position: sticky;
+    top: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .photo-stats-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .ps-card {
+    background: #111317;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.15rem;
+  }
+  .ps-val {
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .ps-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Verbatim Product Philosophy 3 Cards */
+  .phi-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.35rem;
+    margin-bottom: 3.5rem;
+  }
+  .phi-card {
+    background-color: #111317;
+    background-image: radial-gradient(circle at 0% 0%, rgba(255, 107, 43, 0.12) 0%, transparent 55%);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 1.85rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .phi-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(255, 107, 43, 0.28);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    display: inline-block;
+    margin-bottom: 0.9rem;
+  }
+  .phi-title {
+    font-family: var(--font-display);
+    font-size: 1.24rem;
+    font-weight: 500;
+    letter-spacing: -0.028em;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+  }
+  .phi-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.68;
+  }
+
+  @media (max-width: 1024px) {
+    .hero-split { grid-template-columns: 1fr; text-align: center; }
+    .hero-left { margin: 0 auto; }
+    .hero-desc { margin-left: auto; margin-right: auto; }
+    .hero-ctas, .hero-logos-strip { justify-content: center; }
+    .bx-tall-left, .bx-top-right, .bx-mid-right, .bx-bot-left, .bx-bot-right { grid-column: span 12; }
+    .bx-mid-right { grid-template-columns: 1fr; }
+    .iframe-showcase-grid, .shipped-row, .about-split, .about-grid-verbatim, .phi-grid-3 { grid-template-columns: 1fr; }
+    .about-right-sticky { position: static; }
+    .concept-completion-card { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .boldex-counters, .skills-3-grid { grid-template-columns: 1fr; }
+    .tl-v-row { grid-template-columns: 1fr; gap: 0.35rem; }
+  }
+
+  /* ── MODERN SPRING "POP" ANIMATIONS & INTERACTIVE POLISH ── */
+
+  /* 1. Travelling Neon-Orange Data Pulse on Flowchart Connectors */
+  .cc-connector-line {
+    position: relative;
+    overflow: hidden;
+  }
+  .cc-connector-line::after {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: -2px;
+    width: 6px;
+    height: 14px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, transparent, #ff9f68, #ff6b2b);
+    box-shadow: 0 0 10px #ff6b2b;
+    animation: ccPulseDrop 2.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  @keyframes ccPulseDrop {
+    0% { top: -14px; opacity: 0; }
+    20% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* 2. Tactile Spring-Bounce Pop on Metric Bubbles, Skill Pills, Stat Cards & Logos */
+  .bx-bubble,
+  .bx-mini-pill,
+  .sk-item,
+  .hero-logo-item,
+  .ps-card,
+  .bx-av-small {
+    transition:
+      transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-color 0.28s ease,
+      box-shadow 0.28s ease,
+      background 0.28s ease,
+      color 0.28s ease;
+  }
+  .bx-bubble:hover {
+    transform: translateY(-6px) scale(1.11) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 14px 30px rgba(255, 107, 43, 0.28);
+    z-index: 5;
+  }
+  .bx-mini-pill:hover,
+  .sk-item:hover {
+    transform: translateY(-3px) scale(1.06);
+    border-color: rgba(255, 107, 43, 0.55);
+    color: var(--accent);
+    box-shadow: 0 8px 20px rgba(255, 107, 43, 0.18);
+  }
+  .ps-card:hover {
+    transform: translateY(-5px) scale(1.04) !important;
+    border-color: rgba(255, 107, 43, 0.55) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 22px rgba(255, 107, 43, 0.18) !important;
+  }
+  .hero-logo-item:hover {
+    transform: translateY(-3px) scale(1.07);
+    color: var(--accent);
+  }
+
+  /* 3. Liquid Glass Shimmer Sweep Across Pill Buttons */
+  .btn-boldex-pill {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-boldex-pill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 65%;
+    height: 100%;
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.38) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    transition: left 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+  .btn-boldex-pill:hover::after {
+    left: 140%;
+  }
+
+  /* 4. Staggered Spring Pop-In Reveal on Scroll */
+  .pop-item {
+    opacity: 0;
+    transform: translateY(22px) scale(0.92);
+    transition:
+      opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: var(--pop-delay, 0ms);
+  }
+  .pop-item.pop-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* 5. Ambient Floating Neon-Orange Aura Orbs + Global Architectural Micro-Grid */
+  .ambient-aura-wrap {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .global-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    background-size: 140px 140px;
+    mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, #000 30%, transparent 95%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, #000 30%, transparent 95%);
+  }
+  .ambient-aura {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(115px);
+    opacity: 0.13;
+    animation: auraDrift 18s ease-in-out infinite alternate;
+  }
+  .ambient-aura.a1 {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, #ff6b2b 0%, transparent 70%);
+    top: 10%;
+    left: -120px;
+  }
+  .ambient-aura.a2 {
+    width: 540px;
+    height: 540px;
+    background: radial-gradient(circle, #ff854d 0%, transparent 70%);
+    bottom: 6%;
+    right: -140px;
+    animation-delay: -9s;
+  }
+  .ambient-aura.a3 {
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(255, 107, 43, 0.75) 0%, transparent 70%);
+    top: 48%;
+    left: 42%;
+    opacity: 0.07;
+    animation: auraDriftCenter 24s ease-in-out infinite alternate;
+  }
+  @keyframes auraDrift {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(55px, -45px, 0) scale(1.15); }
+  }
+  @keyframes auraDriftCenter {
+    0% { transform: translate3d(-60px, -30px, 0) scale(0.95); }
+    100% { transform: translate3d(70px, 40px, 0) scale(1.15); }
+  }
+  #hero-grid-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    mask-image:
+      radial-gradient(ellipse 95% 88% at 50% 48%, #000 45%, rgba(0,0,0,0.7) 75%, transparent 96%),
+      linear-gradient(to bottom, #000 0%, #000 84%, transparent 100%);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      radial-gradient(ellipse 95% 88% at 50% 48%, #000 45%, rgba(0,0,0,0.7) 75%, transparent 96%);
+  }
+
+  /* 6. Interactive Custom Spring Cursor Ring (Desktop Only) */
+  @media (pointer: fine) {
+    .cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 34px;
+      height: 34px;
+      margin-left: -17px;
+      margin-top: -17px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 107, 43, 0.55);
+      background: rgba(255, 107, 43, 0.04);
+      pointer-events: none;
+      z-index: 9998;
+      transition: width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  height 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  margin 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background 0.25s ease,
+                  border-color 0.25s ease;
+      will-change: transform;
+    }
+    .cursor-ring.cursor-hover {
+      width: 54px;
+      height: 54px;
+      margin-left: -27px;
+      margin-top: -27px;
+      border-color: rgba(255, 107, 43, 0.9);
+      background: rgba(255, 107, 43, 0.12);
+      box-shadow: 0 0 24px rgba(255, 107, 43, 0.25);
+    }
+  }
+  @media (pointer: coarse) {
+    .cursor-ring { display: none; }
+  }
+
+  /* 7. Floating Scroll-Progress Back-to-Top Orb */
+  .scroll-orb-btn {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(17, 19, 23, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 900;
+    opacity: 0;
+    transform: translateY(16px) scale(0.85);
+    pointer-events: none;
+    transition: opacity 0.32s ease, transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  }
+  .scroll-orb-btn.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .scroll-orb-btn:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 14px 34px rgba(255, 107, 43, 0.32);
+    border-color: rgba(255, 107, 43, 0.55);
+  }
+  .scroll-orb-svg {
+    position: absolute;
+    inset: -1px;
+    width: 50px;
+    height: 50px;
+    transform: rotate(-90deg);
+    pointer-events: none;
+  }
+  .scroll-orb-circle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.2;
+    stroke-dasharray: 138;
+    stroke-dashoffset: 138;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<!-- AMBIENT FLOATING NEON-ORANGE AURA ORBS + SUBTLE GLOBAL GRID -->
+<div class="ambient-aura-wrap" aria-hidden="true">
+  <div class="global-bg-grid"></div>
+  <div class="ambient-aura a1"></div>
+  <div class="ambient-aura a2"></div>
+  <div class="ambient-aura a3"></div>
+</div>
+
+<!-- INTERACTIVE SPRING CURSOR FOLLOWER RING -->
+<div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+
+<!-- FLOATING SCROLL-PROGRESS BACK-TO-TOP ORB -->
+<button type="button" class="scroll-orb-btn" id="scroll-orb-btn" aria-label="Scroll to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg class="scroll-orb-svg" viewBox="0 0 50 50">
+    <circle class="scroll-orb-circle" id="scroll-orb-circle" cx="25" cy="25" r="22"></circle>
+  </svg>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- TOP SCROLL LASER BAR -->
+<div id="scroll-laser"></div>
+
+<!-- PAGE TRANSITION CURTAIN -->
+<div id="pt-curtain">
+  <div class="pt-label">Loading Case Study</div>
+  <div class="pt-title" id="pt-title">Opening...</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FLOATING PILL NAVBAR (EXACT BOLDEX STYLE)
+══════════════════════════════════════════════════ -->
+<div class="nav-wrapper" id="nav-wrapper">
+  <nav class="boldex-nav" id="boldex-nav">
+    <a href="#hero" class="nav-profile">
+      <div class="nav-avatar-ring">
+        <img src="profile-cutout.png?v=21" alt="Sai Shreyas" class="nav-avatar">
+      </div>
+      <div class="nav-profile-info">
+        <span class="nav-profile-name">Sai Shreyas</span>
+        <span class="nav-profile-role">Builder PM · <span class="nav-sec-badge" id="nav-sec-badge">NYU MOT '27</span></span>
+      </div>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <div class="nav-indicator-pill" id="nav-indicator-pill" aria-hidden="true"></div>
+      <li><a href="#about" data-sec="about">About</a></li>
+      <li><a href="#services" data-sec="services">Capabilities</a></li>
+      <li><a href="#projects" data-sec="projects">Work</a></li>
+      <li><a href="#process" data-sec="process">Process</a></li>
+      <li><a href="#faq" data-sec="faq">Philosophy</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button type="button" class="btn-glass-pill" onclick="openIframeModal('Shreyas_Resume.pdf', 'Shreyas Resume.pdf')">
+        Resume
+      </button>
+      <a href="#contact" class="nav-cta magnetic-btn">
+        <span class="nav-cta-circle">→</span>
+        <span>Start A Project</span>
+      </a>
+    </div>
+
+    <div class="nav-scroll-progress" aria-hidden="true">
+      <div class="nav-scroll-progress-bar" id="nav-scroll-progress-bar"></div>
+    </div>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     HERO SECTION (TRANSPARENT CUTOUT ON PAGE GRID)
+══════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <canvas id="hero-grid-canvas" aria-hidden="true"></canvas>
+  <div class="hero-ambient-glow"></div>
+
+  <div class="container">
+    <div class="hero-split">
+      <!-- Left Column -->
+      <div class="hero-left">
+        <div class="hero-avail-pill">
+          <span class="hero-avail-dot"></span>
+          <span>Builder PM · NYU MOT '27 · Open to Roles</span>
+        </div>
+
+        <h1 class="hero-title">
+          Engineer Who<br>Thinks Like a<br><span style="color:var(--accent);">Product Person.</span>
+        </h1>
+
+        <p class="hero-desc">
+          Computer Engineering grad turned PM candidate at <strong>NYU Tandon</strong>. Most recently a <strong>Product &amp; Data Intern at TruVideo (Wellesley, MA)</strong> building VQS across <strong>4,000+ dealership accounts</strong> and shipping multi-tenant enterprise platforms across 4 countries.
+        </p>
+
+        <div class="hero-ctas">
+          <a href="#projects" class="btn-boldex-pill magnetic-btn">
+            <span class="btn-boldex-circle">→</span>
+            <span>Explore Case Studies</span>
+          </a>
+          <button type="button" class="btn-glass-pill magnetic-btn" onclick="openIframeModal('Shreyas_Resume.pdf', 'Shreyas Resume.pdf')">
+            Shreyas Resume ⤢
+          </button>
+        </div>
+
+        <div class="hero-logos-strip">
+          <span class="hero-logo-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            NYU Tandon
+          </span>
+          <span class="hero-logo-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
+            TruVideo · Wellesley, MA
+          </span>
+          <span class="hero-logo-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            SMARTeIS
+          </span>
+          <span class="hero-logo-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+            SIH Winner
+          </span>
+        </div>
+      </div>
+
+      <!-- Right Column: Transparent Cutout Directly on Page Background -->
+      <div class="hero-right">
+        <div class="hero-portrait-stage">
+          <div class="hero-orb orb-1" title="Product Strategy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/><path d="M12 21L8 9l4-6 4 6-4 12z"/></svg>
+          </div>
+          <div class="hero-orb orb-2" title="Figma & UX">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>
+          </div>
+          <div class="hero-orb orb-3" title="AI & RAG Systems">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/><path d="M5 3v4"/><path d="M3 5h4"/></svg>
+          </div>
+          <div class="hero-orb orb-4" title="Builder PM & Full-Stack Architecture">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+          </div>
+
+          <!-- Transparent PNG Cutout -->
+          <img src="profile-cutout.png?v=21" alt="Sai Shreyas Vyamajala" class="hero-portrait-img">
+
+          <a href="#projects" class="hero-stamp-badge" title="Explore Case Studies" style="text-decoration:none;cursor:pointer;">
+            <svg class="hero-stamp-ring" viewBox="0 0 120 120">
+              <defs><path id="stampCircle" d="M 60, 60 m -44, 0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0"/></defs>
+              <text><textPath href="#stampCircle">PRODUCT MANAGER • BUILDER PM • NYU MOT • </textPath></text>
+            </svg>
+            <div class="hero-stamp-center">
+              <!-- Builder PM / AI Product North-Star Emblem -->
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L14.6 9.4L22 12L14.6 14.6L12 22L9.4 14.6L2 12L9.4 9.4L12 2Z"/>
+                <circle cx="19" cy="5" r="1.6"/>
+              </svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 1: EXACT 5-CARD WIDGET BENTO GRID FROM SCREENSHOT
+══════════════════════════════════════════════════ -->
+<section id="services">
+  <div class="container">
+    <div class="section-head">
+      <h2>Crafting <span class="accent">Product-First</span> Experiences</h2>
+      <p>I design and ship scalable B2B platforms that blend engineering depth with human-centered UX - ensuring every workflow captivates and converts.</p>
+    </div>
+
+    <div class="boldex-bento">
+
+      <!-- CARD 1 (TALL LEFT): UI/UX & PRODUCT DISCOVERY -->
+      <div class="bx-card bx-tall-left tilt-card">
+        <div>
+          <div class="bx-title-row">
+            <svg class="bx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M7 18c1.2-2 3-3 5-3s3.8 1 5 3"/></svg>
+            <h3 class="bx-title">Product Strategy &amp; UX</h3>
+          </div>
+          <p class="bx-desc">
+            From customer research and PRDs to gated holdout experiments, I ensure a seamless interface that drives adoption and revenue.
+          </p>
+        </div>
+
+        <div class="bx-v1-wrap">
+          <div class="bx-v1-glass-box">
+            <div class="bx-v1-icons">
+              <span>NYU</span>
+              <span>⚡</span>
+              <span>SQL</span>
+              <span>AI</span>
+              <span>◎</span>
+              <span>⌘</span>
+            </div>
+            <div class="bx-v1-caption">Shipped Across Global Enterprise Teams</div>
+          </div>
+
+          <div class="bx-v1-avatars">
+            <div class="bx-av-small">PM</div>
+            <div class="bx-av-small">UX</div>
+            <div class="bx-av-center-rings">
+              <img src="profile-cutout.png?v=21" alt="Sai Shreyas">
+            </div>
+            <div class="bx-av-small">AI</div>
+            <div class="bx-av-small">CPO</div>
+          </div>
+
+          <div class="bx-v1-input">
+            <span>Ship to 4,000+ accounts...</span>
+            <span class="send">Live</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2 (TOP RIGHT): MULTI-TENANT B2B SAAS -->
+      <div class="bx-card bx-top-right tilt-card">
+        <div>
+          <div class="bx-title-row">
+            <svg class="bx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+            <h3 class="bx-title">Enterprise B2B Launches</h3>
+          </div>
+          <p class="bx-desc">
+            Scoped end-to-end launches gated on 36-account holdout tests and shipped across 4,000+ accounts projecting $450K+ annualized revenue.
+          </p>
+        </div>
+
+        <div class="bx-v2-bubbles">
+          <div class="bx-bubble b-light">
+            <strong>4,000+</strong>
+            <span>Accounts</span>
+          </div>
+          <div class="bx-bubble b-dark">
+            <strong>$450K+</strong>
+            <span>ARR Impact</span>
+          </div>
+          <div class="bx-bubble b-accent">
+            <strong style="color:var(--accent);">-40%</strong>
+            <span>Escalations</span>
+          </div>
+          <div class="bx-bubble b-dark">
+            <strong>2,000+</strong>
+            <span>App Users</span>
+          </div>
+          <div class="bx-bubble b-light">
+            <strong>10+</strong>
+            <span>Releases</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3 (MID RIGHT): AI & RAG CUSTOMIZATION (CONCENTRIC RADAR) -->
+      <div class="bx-card bx-mid-right tilt-card">
+        <div>
+          <div class="bx-title-row">
+            <svg class="bx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            <h3 class="bx-title">AI Model Eval &amp; Orchestration</h3>
+          </div>
+          <p class="bx-desc">
+            Benchmarked competing AI models on production data - cutting misdetection 46.2% → 30.8% and holding 90% accuracy via human-in-the-loop eval harnesses.
+          </p>
+        </div>
+
+        <div class="bx-v3-radar">
+          <div class="radar-ring r1"></div>
+          <div class="radar-ring r2"></div>
+          <div class="radar-ring r3"></div>
+          <div class="radar-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a10 10 0 0 0-7 17"/><path d="M12 2a10 10 0 0 1 7 17"/><circle cx="12" cy="12" r="4"/></svg>
+          </div>
+          <div class="radar-node n1">🔒</div>
+          <div class="radar-node n2">((●))</div>
+          <div class="radar-node n3">◉</div>
+          <div class="radar-node n4">✓</div>
+          <div class="radar-node n5">∴</div>
+        </div>
+      </div>
+
+      <!-- CARD 4 (BOTTOM LEFT): CUSTOM SOLUTIONS & ANALYTICS -->
+      <div class="bx-card bx-bot-left tilt-card">
+        <div>
+          <div class="bx-title-row">
+            <svg class="bx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+            <h3 class="bx-title">Fintech &amp; Quantitative Risk</h3>
+          </div>
+          <p class="bx-desc">
+            Monte Carlo VaR/CVaR stress testing, Sharpe/Calmar optimization, and fraud detection classifiers over 284,807 financial records.
+          </p>
+        </div>
+
+        <div class="bx-v4-surface">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--accent);">PRODUCTION METRICS</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-top:2px;">VaR · CVaR · Monte Carlo · SQL</div>
+          </div>
+          <span class="bx-mini-pill hi">-35% False Positives</span>
+        </div>
+      </div>
+
+      <!-- CARD 5 (BOTTOM RIGHT): FULL-STACK, FDE & AI PM STACK -->
+      <div class="bx-card bx-bot-right tilt-card">
+        <div>
+          <div class="bx-title-row">
+            <svg class="bx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 16V9h14V2H5l14 14h-7m-7 0l7 7v-7m-7 0h7"/></svg>
+            <h3 class="bx-title">FDE, Full-Stack &amp; AI PM Stack</h3>
+          </div>
+          <p class="bx-desc">
+            C, C++, Python (Pandas, NumPy, SciPy, Scikit-learn), SQL, Node.js, TypeScript, FastAPI, React 18, Next.js, Flutter, RAG &amp; Vector DBs, LangGraph multi-agent orchestration, LLM-as-a-Judge evals, Docker, and CI/CD pipelines.
+          </p>
+        </div>
+
+        <div class="bx-pill-row">
+          <span class="bx-mini-pill hi">Python · SQL · C++ · C</span>
+          <span class="bx-mini-pill">Node.js · FastAPI · Next.js</span>
+          <span class="bx-mini-pill">RAG · pgvector · LangGraph</span>
+          <span class="bx-mini-pill">LLM Evals · Guardrails · MCP</span>
+          <span class="bx-mini-pill">React 18 · TypeScript · Flutter</span>
+          <span class="bx-mini-pill">Docker · CI/CD · Enterprise APIs</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 2: LIQUID GLASS IFRAME SHOWCASE ("SEE HOW I HELPED...")
+══════════════════════════════════════════════════ -->
+<section id="projects">
+  <div class="container">
+    <div class="section-head">
+      <h2>See How I Helped <span class="accent">Products Scale</span></h2>
+      <p>Each case study is embedded below as a live interactive Liquid Glass frame: scroll inside the preview or open the full case study.</p>
+    </div>
+
+    <div class="iframe-showcase-grid">
+
+      <!-- LIQUID GLASS IFRAME CARD 001: MULTI-TENANT UX -->
+      <article class="liquid-glass-card tilt-card">
+        <div class="lg-window">
+          <div class="lg-topbar">
+            <div class="lg-dots"><span></span><span></span><span></span></div>
+            <div class="lg-url">multitenant.html · Case Study 001</div>
+            <button type="button" class="lg-expand-btn" onclick="openIframeModal('multitenant.html', 'Case Study 001: Multi-Tenant Systems UX')">Expand ⤢</button>
+          </div>
+          <div class="lg-iframe-wrap">
+            <iframe src="multitenant.html" loading="lazy" title="Case Study 001: The Hidden UX Crisis in Multi-Tenant Systems"></iframe>
+          </div>
+        </div>
+
+        <div class="lg-footer">
+          <div class="lg-meta-row">
+            <span class="lg-tag">001 · Enterprise SaaS · B2B</span>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">SMARTeIS · PEPPOL · RICE</span>
+          </div>
+          <h3 class="lg-title">The Hidden UX Crisis in Multi-Tenant Systems</h3>
+          <p class="lg-desc">
+            I shipped product on a multi-tenant e-invoicing platform as a Product Management Intern. This is my PM retrospective of what I observed while building, what was broken, and what I'd have prioritised differently.
+          </p>
+          <div class="lg-actions">
+            <a href="multitenant.html" class="btn-boldex-pill magnetic-btn" data-transition-title="Case 001: Multi-Tenant Systems UX">
+              <span class="btn-boldex-circle">→</span>
+              <span>Open Full Case Study</span>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- LIQUID GLASS IFRAME CARD 002: AI PRODUCT OPS CO-PILOT -->
+      <article class="liquid-glass-card tilt-card">
+        <div class="lg-window">
+          <div class="lg-topbar">
+            <div class="lg-dots"><span></span><span></span><span></span></div>
+            <div class="lg-url">ai-copilot.html · Case Study 002</div>
+            <button type="button" class="lg-expand-btn" onclick="openIframeModal('ai-copilot.html', 'Case Study 002: AI Product Ops Co-pilot')">Expand ⤢</button>
+          </div>
+          <div class="lg-iframe-wrap">
+            <iframe src="ai-copilot.html" loading="lazy" title="Case Study 002: AI Product Ops Co-pilot"></iframe>
+          </div>
+        </div>
+
+        <div class="lg-footer">
+          <div class="lg-meta-row">
+            <span class="lg-tag">002 · AI · Internal Tool · B2B</span>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">RAG · LLM · Eval Loops</span>
+          </div>
+          <h3 class="lg-title">AI Product Ops Co-pilot</h3>
+          <p class="lg-desc">
+            PMs lose 40% of their week to status syncs and ticket triage. A product analysis of how to build an AI co-pilot responsibly with architecture, eval loops, and failure modes.
+          </p>
+          <div class="lg-actions">
+            <a href="ai-copilot.html" class="btn-boldex-pill magnetic-btn" data-transition-title="Case 002: AI Product Ops Co-pilot">
+              <span class="btn-boldex-circle">→</span>
+              <span>Open Full Case Study</span>
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- SHIPPED END-TO-END PRODUCTS WITH GITHUB & LIVE DEMO LINKS -->
+    <div class="shipped-row">
+      <!-- 1. ARCUS + LIVE LINK -->
+      <div class="shipped-card tilt-card">
+        <div>
+          <span class="lg-tag">Founder · Live Product · NYU Leslie eLab</span>
+          <h4>Arcus: Investing &amp; Portfolio Risk Platform</h4>
+          <p>Founded and shipped a live retail investing analytics product in 3 weeks (75+ active users): computes VaR, CVaR, Sharpe &amp; Calmar ratios, Monte Carlo stress tests, and a human-in-the-loop AI eval harness holding 90% accuracy in production.</p>
+        </div>
+        <div class="shipped-footer">
+          <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--accent);">Python · FastAPI · NumPy/SciPy · React 18 · TypeScript · SQL</span>
+          <div class="shipped-links">
+            <a href="https://github.com/shreyas1504/Arcus" target="_blank" rel="noopener" class="gh-pill-link">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.39-3.88-1.39-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+              <span>Arcus Repo</span>
+            </a>
+            <a href="https://arcus-insights.com" target="_blank" rel="noopener" class="gh-pill-link live">
+              <span>Live App ↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PLAN MY DAY (MULTI-AGENT AI ORCHESTRATOR) -->
+      <div class="shipped-card tilt-card">
+        <div>
+          <span class="lg-tag">Multi-Agent AI · StateGraph Orchestrator</span>
+          <h4>Plan My Day: Deterministic Multi-Agent Day Planner</h4>
+          <p>Built a 4-agent StateGraph orchestrator (Logistics, Weather, Planner, Outline) using Gemini, OpenRouteService, Open-Meteo, and OpenStreetMap opening_hours with deterministic arrival-vs-closing conflict checks, automatic loop-backs, and full event-log replay.</p>
+        </div>
+        <div class="shipped-footer">
+          <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--accent);">TypeScript · Next.js · Node.js · Gemini · StateGraph · CI/CD</span>
+          <div class="shipped-links">
+            <a href="https://github.com/shreyas1504/plan-my-day" target="_blank" rel="noopener" class="gh-pill-link">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.39-3.88-1.39-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+              <span>GitHub Repo</span>
+            </a>
+            <a href="https://plan-my-day-xi.vercel.app" target="_blank" rel="noopener" class="gh-pill-link live">
+              <span>Live App ↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ML FRAUD DETECTOR & QUANT ENGINE (COMBINED CARD) -->
+      <div class="shipped-card tilt-card">
+        <div>
+          <span class="lg-tag">Risk Pipeline &amp; Quant Engine · 284,807 Records</span>
+          <h4>ML Fraud Detector &amp; Quant Portfolio Risk Engine</h4>
+          <p>Built a dual-engine transaction risk classifier over 284,807 financial records (cutting false positives 35% and review time 90%) alongside a quantitative portfolio risk engine computing VaR, CVaR, Sharpe/Calmar ratios, and Monte Carlo stress simulations.</p>
+        </div>
+        <div class="shipped-footer">
+          <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--accent);">Python · SQL · Scikit-learn · NumPy/SciPy · Streamlit</span>
+          <div class="shipped-links">
+            <a href="https://github.com/shreyas1504/fraudsimulator" target="_blank" rel="noopener" class="gh-pill-link">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.39-3.88-1.39-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+              <span>Fraud Detector</span>
+            </a>
+            <a href="https://github.com/shreyas1504/portfolio-risk-tracker" target="_blank" rel="noopener" class="gh-pill-link">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.93.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.39-3.88-1.39-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+              <span>Quant Engine</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 3: "FROM CONCEPT TO COMPLETION" - HOW I BUILD SYSTEMS
+══════════════════════════════════════════════════ -->
+<section id="process">
+  <div class="container">
+    <div class="concept-completion-card tilt-card">
+
+      <!-- LEFT COLUMN: VERTICAL 4-STEP CONNECTED FLOWCHART -->
+      <div class="cc-flowchart">
+
+        <!-- Step 1 Pill -->
+        <div class="cc-pill-node active" data-cc-step="1">
+          <span class="cc-pill-icon">
+            <!-- Document / Analytics Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+          </span>
+          <span class="cc-pill-label">Research &amp; Funnel Analysis</span>
+        </div>
+
+        <!-- Connector 1 -> 2 -->
+        <div class="cc-connector" aria-hidden="true">
+          <span class="cc-connector-dot"></span>
+          <span class="cc-connector-line"></span>
+          <svg class="cc-connector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <!-- Step 2 Pill -->
+        <div class="cc-pill-node" data-cc-step="2">
+          <span class="cc-pill-icon">
+            <!-- Lightbulb / Ideation & Architecture Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6"/>
+              <path d="M10 22h4"/>
+              <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/>
+            </svg>
+          </span>
+          <span class="cc-pill-label">PRD Scoping &amp; System Specs</span>
+        </div>
+
+        <!-- Connector 2 -> 3 -->
+        <div class="cc-connector" aria-hidden="true">
+          <span class="cc-connector-dot"></span>
+          <span class="cc-connector-line"></span>
+          <svg class="cc-connector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <!-- Step 3 Pill -->
+        <div class="cc-pill-node" data-cc-step="3">
+          <span class="cc-pill-icon">
+            <!-- UI Layout / Prototyping & AI Evals Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="3"/>
+              <rect x="6.5" y="8" width="5" height="4" rx="1"/>
+              <line x1="14" y1="9" x2="17.5" y2="9"/>
+              <line x1="14" y1="12" x2="17.5" y2="12"/>
+              <line x1="6.5" y1="16" x2="17.5" y2="16"/>
+            </svg>
+          </span>
+          <span class="cc-pill-label">Prototyping &amp; AI Eval Loops</span>
+        </div>
+
+        <!-- Connector 3 -> 4 -->
+        <div class="cc-connector" aria-hidden="true">
+          <span class="cc-connector-dot"></span>
+          <span class="cc-connector-line"></span>
+          <svg class="cc-connector-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <!-- Step 4 Pill -->
+        <div class="cc-pill-node" data-cc-step="4">
+          <span class="cc-pill-icon">
+            <!-- Checkmark / Holdout Testing & Iteration Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"/>
+              <polyline points="8.5 12.5 11 15 15.5 9.5"/>
+            </svg>
+          </span>
+          <span class="cc-pill-label">Holdout Testing &amp; Rollout</span>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: HEADER + 2X2 NUMBERED STEPS GRID -->
+      <div class="cc-right-content">
+        <div class="cc-header">
+          <!-- Neon Orange Hourglass Icon -->
+          <svg class="cc-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 22h14"/>
+            <path d="M5 2h14"/>
+            <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/>
+            <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>
+          </svg>
+          <h2>From Concept to Completion</h2>
+        </div>
+
+        <div class="cc-steps-grid">
+          <!-- 01 -->
+          <div class="cc-step-item active" data-cc-step="1">
+            <div class="cc-step-badge">01</div>
+            <h4>Research &amp; Funnel Analysis</h4>
+            <p>Diagnosing user friction via JTBD customer interviews, SQL/Python funnel drop-offs, and root-cause telemetry.</p>
+          </div>
+
+          <!-- 02 -->
+          <div class="cc-step-item" data-cc-step="2">
+            <div class="cc-step-badge">02</div>
+            <h4>PRD Scoping &amp; System Specs</h4>
+            <p>Structuring RICE roadmaps, multi-tenant API contracts, failure modes, and latency/cost tradeoffs before code is written.</p>
+          </div>
+
+          <!-- 03 -->
+          <div class="cc-step-item" data-cc-step="3">
+            <div class="cc-step-badge">03</div>
+            <h4>Prototyping &amp; AI Eval Loops</h4>
+            <p>Building interactive Figma flows alongside human-in-the-loop LLM evaluation harnesses holding 90%+ accuracy in production.</p>
+          </div>
+
+          <!-- 04 -->
+          <div class="cc-step-item" data-cc-step="4">
+            <div class="cc-step-badge">04</div>
+            <h4>Holdout Testing &amp; Rollout</h4>
+            <p>Gating launches on controlled holdout experiments (36-account pilot → 4,000+ account scale) and iterating on live revenue &amp; retention metrics.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 4: VERBATIM ABOUT SECTION FROM EXISTING PORTFOLIO + SHREYAS RESUME
+══════════════════════════════════════════════════ -->
+<section id="about">
+  <div class="container">
+    <div class="about-eyebrow">01 · About &amp; Experience</div>
+    <h2 class="about-main-heading">Built systems as an engineer.<br>Now I ask <span style="color:var(--accent);">why they were built.</span></h2>
+
+    <div class="about-grid-verbatim">
+
+      <!-- LEFT COLUMN: VERBATIM BIO, 3-COL SKILLS, AND 5-ROW TIMELINE -->
+      <div class="about-text-col">
+        <p>
+          Computer Engineering at <strong>Thapar Institute of Engineering &amp; Technology</strong> (2021–2025),
+          now MS in Management of Technology at <strong>NYU Tandon</strong>.
+          I came into product through the build side of things: writing React components, wiring REST APIs,
+          delivering Jira tickets across two week sprints and found myself constantly asking questions engineers weren't supposed to ask:
+          <em>Why is this screen designed like this? Who actually uses this flow? Why does onboarding keep failing?</em>
+        </p>
+        <p>
+          Most recently, as a <strong>Product &amp; Data Intern at TruVideo (Wellesley, MA)</strong>, I helped shape VQS by connecting
+          product decisions with customer needs, usage data and AI performance. I led a product launch end-to-end: scoped from customer research, wrote the requirements, set the KPIs, gated release on a controlled 36-account test against a concurrent holdout group, and shipped to <strong>4,000+ accounts</strong> on schedule. I monitored adoption, usage, and engagement in production with SQL and Python, benchmarked competing AI models against raw production data to cut misdetection <strong>46.2% → 30.8%</strong>, and was the voice of the product across engineering, finance, vendors, and the CPO to build the business case projecting <strong>$450K+ annualized revenue</strong>.
+        </p>
+        <p>
+          That product shift crystallised at <strong>Skill Quotient Group</strong>, where I spent 5 months
+          as a Product Management Intern on SMARTeIS which is a <em>PEPPOL-compliant multi-tenant e-invoicing platform</em>
+          across Malaysia, Indonesia, Singapore and U.A.E. I wrote and prioritized user stories on a 20-person Agile team,
+          owned the backlog across 10+ launches, cut edge-case defects 25% and escalations 40%, and sat in rooms watching <strong>Tenant Admins struggle
+          to configure a product we'd just built</strong>. That gap between what shipped and what users needed
+          is what pushed me deeper into product.
+        </p>
+        <p>
+          Before that, at <strong>Legitimate India</strong>, a startup building a LinkedIn-style professional network for Indian lawyers,
+          I ran 10+ interviews with legal professionals, benchmarked 15+ competing platforms across 5+ build cycles, and shipped 8 MVP features.
+          No PM title, but the work was product through and through. I also led <strong>FROSH</strong>,
+          a campus utility app for Thapar's orientation week, which reached
+          <strong>2,000+ organic downloads</strong> (700+ daily actives, rating lifted 3.6 → 4.2) in its first semester.
+        </p>
+
+        <!-- 3-Column Skills Block: AI PM, Forward Deployed Engineering (FDE) & Quant/Data -->
+        <div class="skills-3-grid">
+          <div>
+            <div class="sk-col-head">AI PM &amp; Product</div>
+            <div class="sk-item">Technical PRDs &amp; System Specs</div>
+            <div class="sk-item">0-to-1 Field Prototyping</div>
+            <div class="sk-item">LLM Eval Harnesses &amp; Guardrails</div>
+            <div class="sk-item">Model Benchmarking &amp; Routing</div>
+            <div class="sk-item">Latency &amp; Token Cost Tradeoffs</div>
+            <div class="sk-item">Gated Holdout &amp; A/B Testing</div>
+            <div class="sk-item">RICE / MoSCoW Roadmapping</div>
+            <div class="sk-item">Pilot-to-Production GTM</div>
+          </div>
+          <div>
+            <div class="sk-col-head">FDE &amp; Engineering</div>
+            <div class="sk-item">Python, SQL, C++, C</div>
+            <div class="sk-item">Node.js, FastAPI, Next.js</div>
+            <div class="sk-item">React 18, TypeScript, Flutter</div>
+            <div class="sk-item">RAG, Vector DBs (pgvector/FAISS)</div>
+            <div class="sk-item">Claude, Gemini, LangGraph, MCP</div>
+            <div class="sk-item">REST / GraphQL APIs &amp; Webhooks</div>
+            <div class="sk-item">Multi-Tenant RBAC &amp; OAuth2/SSO</div>
+            <div class="sk-item">Docker, CI/CD, Git &amp; Telemetry</div>
+          </div>
+          <div>
+            <div class="sk-col-head">Data, Quant &amp; GTM</div>
+            <div class="sk-item">SQL / Python Funnel Diagnostics</div>
+            <div class="sk-item">Precision / Recall / F1 Tuning</div>
+            <div class="sk-item">OKR / KPI &amp; North Star Design</div>
+            <div class="sk-item">VaR / CVaR &amp; Monte Carlo Risk</div>
+            <div class="sk-item">Enterprise Solution Architecture</div>
+            <div class="sk-item">Stakeholder &amp; C-Suite Alignment</div>
+            <div class="sk-item">ARR / ROI Revenue Modeling</div>
+            <div class="sk-item">Incident Rollback &amp; SLA Design</div>
+          </div>
+        </div>
+
+        <!-- Verbatim 5-Row Experience Timeline -->
+        <div class="tl-verbatim">
+          <div class="tl-v-row">
+            <div class="tl-v-date">Jun – Aug 2026</div>
+            <div>
+              <div class="tl-v-title">Product &amp; Data Intern, TruVideo · Wellesley, MA</div>
+              <div class="tl-v-desc">Led a product launch end to end: scoped from customer research, wrote the requirements, set the KPIs, gated release on a controlled 36-account test against a concurrent holdout group, and shipped to 4,000+ accounts on schedule. Monitored adoption, usage and engagement in production with SQL and Python, turning each drop-off into a prioritized requirement. Made a data-driven call on competing AI models, benchmarking both against raw production data and cutting misdetection 46.2% → 30.8%, and was the voice of the product across engineering, finance, vendors and the CPO, building the business case that projected $450K+ annualized revenue.</div>
+            </div>
+          </div>
+
+          <div class="tl-v-row">
+            <div class="tl-v-date">Aug 2025 → May 2027</div>
+            <div>
+              <div class="tl-v-title">NYU, M.S. in Management of Technology · New York, NY</div>
+              <div class="tl-v-desc">Studying Product Management, Data Visualization &amp; Business Analytics, Financial Planning, and Supply Chain Management. Awarded an $18,000 NYU Merit Scholarship (top 10% of cohort) and selected for the NYU Leslie eLab Startup Bootcamp.</div>
+            </div>
+          </div>
+
+          <div class="tl-v-row">
+            <div class="tl-v-date">Feb – Jun 2025</div>
+            <div>
+              <div class="tl-v-title">Product Management Intern, Skill Quotient Group · Remote</div>
+              <div class="tl-v-desc">Shipped 10+ releases with a 20-person cross-functional team of engineers, designers, and QA across 4 countries, cutting edge-case defects 25% and escalations 40% for SMARTeIS, a PEPPOL-compliant multi-tenant e-invoicing platform.</div>
+            </div>
+          </div>
+
+          <div class="tl-v-row">
+            <div class="tl-v-date">Feb – May 2023</div>
+            <div>
+              <div class="tl-v-title">Product Intern, Legitimate India · New Delhi, India</div>
+              <div class="tl-v-desc">Ran 10+ interviews with legal professionals and competitive analysis across 15+ products and 5+ build cycles, shipping 8 MVP features.</div>
+            </div>
+          </div>
+
+          <div class="tl-v-row">
+            <div class="tl-v-date">Oct 2021 – Jun 2025</div>
+            <div>
+              <div class="tl-v-title">B.E. Computer Engineering &amp; Product Lead (FROSH), Thapar Institute · Patiala, India</div>
+              <div class="tl-v-desc">Led 7 engineers and designers to launch the FROSH campus app on Google Play in 8 weeks: 2,000+ users, 700+ daily actives, and store rating lifted 3.6 → 4.2. Smart India Hackathon Winner (1st amongst 5,000+ teams).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT STICKY COLUMN: 4 STAT CARDS + LIQUID GLASS SHREYAS RESUME FRAME -->
+      <aside class="about-right-sticky">
+        <div class="photo-stats-4">
+          <div class="ps-card">
+            <div class="ps-val" data-count="4000" data-suffix="+">4,000+</div>
+            <div class="ps-lbl">Accounts Shipped</div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-val" data-count="2000" data-suffix="+">2K+</div>
+            <div class="ps-lbl">App Downloads</div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-val" data-count="4" data-suffix="">4</div>
+            <div class="ps-lbl">Countries</div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-val" data-prefix="$" data-count="18" data-suffix="K">$18K</div>
+            <div class="ps-lbl">NYU Scholarship</div>
+          </div>
+        </div>
+
+        <!-- Liquid Glass Embedded Shreyas Resume Iframe -->
+        <div class="liquid-glass-card tilt-card">
+          <div class="lg-window" style="height: 480px;">
+            <div class="lg-topbar">
+              <div class="lg-dots"><span></span><span></span><span></span></div>
+              <div class="lg-url">Shreyas Resume.pdf</div>
+              <button type="button" class="lg-expand-btn" onclick="openIframeModal('Shreyas_Resume.pdf', 'Shreyas Resume.pdf')">Fullscreen ⤢</button>
+            </div>
+            <div class="lg-iframe-wrap">
+              <iframe src="Shreyas_Resume.pdf" style="width:100%;height:100%;transform:none;" title="Shreyas Resume Preview"></iframe>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 0.35rem;">
+            <span style="font-size:0.84rem;color:var(--text-sec);font-weight:600;">Shreyas Resume.pdf</span>
+            <a href="Shreyas_Resume.pdf" download="Shreyas Resume.pdf" target="_blank" rel="noopener" style="color:var(--accent);font-family:var(--font-mono);font-size:0.75rem;text-decoration:none;">Download Shreyas Resume ↓</a>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 5: PRODUCT PHILOSOPHY (VERBATIM) & FAQ
+══════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="container">
+    <div class="section-head">
+      <h2>How I Think About <span class="accent">Products</span></h2>
+      <p>Three product philosophy pillars shaped from wiring multi-tenant APIs, running enterprise pilots, and shipping consumer apps.</p>
+    </div>
+
+    <!-- Verbatim 3 Philosophy Cards -->
+    <div class="phi-grid-3">
+      <div class="phi-card tilt-card">
+        <span class="phi-num">01</span>
+        <h3 class="phi-title">Engineers see what PMs miss</h3>
+        <p class="phi-desc">Months wiring multi-tenant APIs taught me more about Tenant Admin needs than any persona workshop. The sharpest product insight I've had came from actually building the thing, not from a framework.</p>
+      </div>
+
+      <div class="phi-card tilt-card">
+        <span class="phi-num">02</span>
+        <h3 class="phi-title">The admin is your real customer</h3>
+        <p class="phi-desc">In B2B, the person signing the check is never the daily user. The workspace admin decides renewal. I watched this play out firsthand watching admins struggle with SMARTeIS configuration across Southeast Asia.</p>
+      </div>
+
+      <div class="phi-card tilt-card">
+        <span class="phi-num">03</span>
+        <h3 class="phi-title">Metrics need a narrative</h3>
+        <p class="phi-desc">DAU went up 15%. For which users? Which cohort? Numbers only matter when they're connected to a story about behaviour change. I learned that from watching FROSH crash and engagement data after we launched.</p>
+      </div>
+    </div>
+
+    <div class="faq-stack">
+      <div class="faq-item open">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)">
+          <span>How did you validate and ship the TruVideo launch across 4,000+ accounts?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a" style="max-height:160px;">
+          <div class="faq-a-inner">
+            I scoped the feature from dealership customer research, authored the PRD and KPIs, gated the release on a controlled 36-account pilot against a concurrent holdout group, benchmarked competing AI models on production data (cutting misdetection from 46.2% to 30.8%), and built the $450K+ ARR business case.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)">
+          <span>How do you ensure AI features stay reliable in production?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">
+            Both at TruVideo and when building Arcus, I designed human-in-the-loop AI evaluation harnesses to benchmark model outputs against raw production ground truth before they reach users making financial or operational decisions - holding 90%+ accuracy in production.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button type="button" class="faq-q" onclick="toggleFaq(this)">
+          <span>What roles and locations am I available for?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">
+            Based in New York, NY (NYU Tandon MS in Management of Technology, Expected May 2027) and open to Product Management, Technical PM, AI PM, and Product &amp; Data roles.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 6: CTA BANNER ("LET'S BUILD SOMETHING WORTH USING")
+══════════════════════════════════════════════════ -->
+<section id="contact">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Let’s build something <span style="color:var(--accent);">worth using.</span></h2>
+      <p>Ready to ship products that blend engineering rigor, AI eval discipline, and human-centered design? Let’s connect.</p>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:0.85rem;flex-wrap:wrap;">
+        <a href="mailto:sv3233@nyu.edu" class="btn-boldex-pill magnetic-btn">
+          <span class="btn-boldex-circle">→</span>
+          <span>sv3233@nyu.edu</span>
+        </a>
+        <a href="Shreyas_Resume.pdf" download="Shreyas Resume.pdf" target="_blank" rel="noopener" class="btn-glass-pill magnetic-btn">
+          Shreyas Resume, Download PDF ↓
+        </a>
+      </div>
+
+      <div class="contact-pills">
+        <a href="https://linkedin.com/in/shreyas1504" target="_blank" rel="noopener" class="contact-pill">LinkedIn, shreyas1504 ↗</a>
+        <a href="https://github.com/shreyas1504" target="_blank" rel="noopener" class="contact-pill">GitHub, shreyas1504 ↗</a>
+        <a href="mailto:sv3233@nyu.edu" class="contact-pill">sv3233@nyu.edu →</a>
+        <a href="tel:3472229525" class="contact-pill">347-222-9525 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <span>Sai Shreyas Vyamajala, NYU MOT '27</span>
+    <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--muted);">New York, NY</span>
+  </div>
+</footer>
+
+<!-- FULLSCREEN LIQUID GLASS IFRAME MODAL -->
+<div class="iframe-modal-backdrop" id="iframe-modal" onclick="if(event.target===this) closeIframeModal()">
+  <div class="iframe-modal-window">
+    <div class="im-topbar">
+      <div class="im-title">
+        <div class="lg-dots"><span></span><span></span><span></span></div>
+        <span id="im-title-text">Shreyas Resume.pdf</span>
+      </div>
+      <div class="im-actions">
+        <a href="Shreyas_Resume.pdf" download="Shreyas Resume.pdf" id="im-open-full" class="im-btn primary" target="_blank">Open / Download ↗</a>
+        <button type="button" class="im-btn" onclick="closeIframeModal()">Close [ESC]</button>
+      </div>
+    </div>
+    <iframe src="about:blank" class="im-frame" id="im-frame-el" title="Fullscreen Iframe Preview"></iframe>
+  </div>
+</div>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const answer = item.querySelector('.faq-a');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(other => {
+      other.classList.remove('open');
+      other.querySelector('.faq-a').style.maxHeight = '0px';
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  }
+
+  function openIframeModal(url, title) {
+    const modal = document.getElementById('iframe-modal');
+    const frame = document.getElementById('im-frame-el');
+    document.getElementById('im-title-text').textContent = title;
+    const fullBtn = document.getElementById('im-open-full');
+    fullBtn.href = url;
+    if (url.toLowerCase().includes('resume')) {
+      fullBtn.setAttribute('download', 'Shreyas Resume.pdf');
+    } else {
+      fullBtn.removeAttribute('download');
+    }
+    frame.src = url;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeIframeModal() {
+    const modal = document.getElementById('iframe-modal');
+    const frame = document.getElementById('im-frame-el');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { frame.src = 'about:blank'; }, 250);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeIframeModal();
+  });
+
+  document.querySelectorAll('a[data-transition-title]').forEach(link => {
+    link.addEventListener('click', e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      document.getElementById('pt-title').textContent = link.getAttribute('data-transition-title');
+      document.getElementById('pt-curtain').classList.add('pt-entering');
+      setTimeout(() => { window.location.href = href; }, 420);
+    });
+  });
+
+  // ── 1. TOP SCROLL LASER PROGRESS BAR ──
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement.scrollTop;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const bar = document.getElementById('scroll-laser');
+    if (bar && h > 0) bar.style.width = (s / h * 100) + '%';
+  }, { passive: true });
+
+  // ── 2. MAGNETIC BUTTON PULL EFFECT ──
+  document.querySelectorAll('.magnetic-btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width / 2) * 0.22;
+      const y = (e.clientY - r.top - r.height / 2) * 0.22;
+      btn.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate3d(0, 0, 0)';
+    });
+  });
+
+  // ── 3. LIVE SCROLL-DRIVEN CARD SCALE UP / SCALE DOWN + 3D CURSOR TILT & SPOTLIGHT ENGINE ──
+  (function initScrollAndTiltPhysics() {
+    const selectors = [
+      '.bx-card',
+      '.liquid-glass-card',
+      '.shipped-card',
+      '.concept-completion-card',
+      '.phi-card',
+      '.tl-v-row',
+      '.ps-card',
+      '.faq-item',
+      '.cta-banner'
+    ];
+    const cards = Array.from(document.querySelectorAll(selectors.join(',')));
+    if (!cards.length) return;
+
+    const state = cards.map(el => {
+      el.style.willChange = 'transform, opacity, border-color, box-shadow';
+      el.style.transition = 'border-color 0.25s ease';
+      return {
+        el,
+        currScale: 0.94,
+        currY: 18,
+        currOpacity: 0.7,
+        currRotX: 0,
+        currRotY: 0,
+        targetRotX: 0,
+        targetRotY: 0,
+        hovered: false
+      };
+    });
+
+    state.forEach(item => {
+      item.el.addEventListener('mouseenter', () => { item.hovered = true; });
+      item.el.addEventListener('mousemove', e => {
+        const r = item.el.getBoundingClientRect();
+        const mx = e.clientX - r.left;
+        const my = e.clientY - r.top;
+        item.el.style.setProperty('--mx', mx + 'px');
+        item.el.style.setProperty('--my', my + 'px');
+        if (item.el.classList.contains('tilt-card')) {
+          const nx = (mx / r.width) - 0.5;
+          const ny = (my / r.height) - 0.5;
+          item.targetRotY = nx * 6.5;
+          item.targetRotX = -ny * 6.5;
+        }
+      });
+      item.el.addEventListener('mouseleave', () => {
+        item.hovered = false;
+        item.targetRotX = 0;
+        item.targetRotY = 0;
+      });
+    });
+
+    function computeTargets() {
+      const vh = window.innerHeight || 800;
+      const focalY = vh * 0.5;
+      const maxDist = vh * 0.68;
+
+      for (let i = 0; i < state.length; i++) {
+        const item = state[i];
+        const rect = item.el.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height * 0.5;
+        const signedNorm = (cardCenter - focalY) / maxDist;
+
+        // Bell curve peaking at 1.0 when centered in viewport, tapering down above and below
+        const focusBell = Math.exp(-Math.pow(signedNorm * 1.4, 2));
+
+        // Scale swells up from 0.90 -> peaks at 1.025 in center -> decreases back to 0.91 as scroll finishes
+        let targetScale = 0.905 + focusBell * 0.12;
+        if (item.hovered) targetScale += 0.016;
+
+        // Vertical glide
+        const targetY = signedNorm * 22 * (1 - focusBell * 0.45);
+        const targetOpacity = Math.max(0.45, Math.min(1, 0.48 + focusBell * 0.62));
+
+        item.currScale += (targetScale - item.currScale) * 0.14;
+        item.currY += (targetY - item.currY) * 0.14;
+        item.currOpacity += (targetOpacity - item.currOpacity) * 0.14;
+        item.currRotX += (item.targetRotX - item.currRotX) * 0.15;
+        item.currRotY += (item.targetRotY - item.currRotY) * 0.15;
+
+        item.el.style.transform = `perspective(1000px) translate3d(0, ${item.currY.toFixed(2)}px, 0) scale(${item.currScale.toFixed(4)}) rotateX(${item.currRotX.toFixed(2)}deg) rotateY(${item.currRotY.toFixed(2)}deg)`;
+        item.el.style.opacity = item.currOpacity.toFixed(3);
+
+        if (focusBell > 0.76 || item.hovered) {
+          item.el.style.borderColor = `rgba(255, 107, 43, ${(0.22 + focusBell * 0.26).toFixed(2)})`;
+          item.el.style.boxShadow = `0 24px 60px rgba(0, 0, 0, 0.6), 0 0 ${Math.round(focusBell * 30)}px rgba(255, 107, 43, ${(focusBell * 0.13).toFixed(2)})`;
+        } else {
+          item.el.style.borderColor = 'rgba(255, 255, 255, 0.07)';
+          item.el.style.boxShadow = 'none';
+        }
+      }
+
+      requestAnimationFrame(computeTargets);
+    }
+
+    requestAnimationFrame(computeTargets);
+  })();
+
+  // ── 4. INTERACTIVE "FROM CONCEPT TO COMPLETION" FLOWCHART <-> 2X2 GRID SYNC ──
+  (function initConceptCompletionFlow() {
+    const pills = Array.from(document.querySelectorAll('.cc-pill-node[data-cc-step]'));
+    const steps = Array.from(document.querySelectorAll('.cc-step-item[data-cc-step]'));
+    const card = document.querySelector('.concept-completion-card');
+    if (!pills.length || !steps.length || !card) return;
+
+    let currentStep = 1;
+    let isHovered = false;
+
+    function activateStep(stepNum) {
+      currentStep = Number(stepNum);
+      pills.forEach(p => p.classList.toggle('active', Number(p.dataset.ccStep) === currentStep));
+      steps.forEach(s => s.classList.toggle('active', Number(s.dataset.ccStep) === currentStep));
+    }
+
+    [...pills, ...steps].forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        isHovered = true;
+        activateStep(el.dataset.ccStep);
+      });
+      el.addEventListener('click', () => {
+        activateStep(el.dataset.ccStep);
+      });
+    });
+
+    card.addEventListener('mouseleave', () => {
+      isHovered = false;
+    });
+
+    setInterval(() => {
+      if (!isHovered) {
+        const next = (currentStep % 4) + 1;
+        activateStep(next);
+      }
+    }, 2800);
+  })();
+
+  // ── 5. SPRING CURSOR FOLLOWER RING + SCROLL PROGRESS ORB + STAGGERED POP-IN ENGINE ──
+  (function initPopAndCursorEffects() {
+    // A. Spring Cursor Ring (Desktop)
+    const ring = document.getElementById('cursor-ring');
+    if (ring && window.matchMedia('(pointer: fine)').matches) {
+      let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+      let cx = tx, cy = ty;
+
+      window.addEventListener('mousemove', e => {
+        tx = e.clientX;
+        ty = e.clientY;
+      }, { passive: true });
+
+      function tickCursor() {
+        cx += (tx - cx) * 0.18;
+        cy += (ty - cy) * 0.18;
+        ring.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
+        requestAnimationFrame(tickCursor);
+      }
+      requestAnimationFrame(tickCursor);
+
+      const hoverTargets = 'a, button, .cc-pill-node, .cc-step-item, .bx-bubble, .bx-mini-pill, .sk-item, .gh-pill-link, .faq-q';
+      document.querySelectorAll(hoverTargets).forEach(el => {
+        el.addEventListener('mouseenter', () => ring.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => ring.classList.remove('cursor-hover'));
+      });
+    }
+
+    // B. Floating Scroll-Progress Back-to-Top Orb + Scroll-Reactive Top Navbar Indicator
+    const orbBtn = document.getElementById('scroll-orb-btn');
+    const orbCircle = document.getElementById('scroll-orb-circle');
+    const navWrap = document.getElementById('nav-wrapper');
+    const navEl = document.getElementById('boldex-nav');
+    const navProgressBar = document.getElementById('nav-scroll-progress-bar');
+    const navIndicator = document.getElementById('nav-indicator-pill');
+    const navSecBadge = document.getElementById('nav-sec-badge');
+    const navLinks = Array.from(document.querySelectorAll('.nav-links a[data-sec]'));
+    const sectionOrder = [
+      { id: 'hero', label: "NYU MOT '27" },
+      { id: 'services', label: 'Capabilities' },
+      { id: 'projects', label: 'Case Studies' },
+      { id: 'process', label: 'How I Build' },
+      { id: 'about', label: 'About Me' },
+      { id: 'faq', label: 'Philosophy' },
+      { id: 'contact', label: 'Start A Project' }
+    ];
+    const circumference = 138;
+
+    function updateNavIndicator() {
+      const s = document.documentElement.scrollTop || window.scrollY;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = h > 0 ? Math.max(0, Math.min(100, (s / h) * 100)) : 0;
+
+      if (orbBtn) {
+        orbBtn.classList.toggle('visible', s > 340);
+      }
+      if (orbCircle && h > 0) {
+        const offset = circumference - (s / h) * circumference;
+        orbCircle.style.strokeDashoffset = Math.max(0, Math.min(circumference, offset)).toFixed(1);
+      }
+      if (navWrap) navWrap.classList.toggle('scrolled-wrap', s > 40);
+      if (navEl) navEl.classList.toggle('is-scrolled', s > 40);
+      if (navProgressBar) navProgressBar.style.width = pct.toFixed(1) + '%';
+
+      // Determine active section based on viewport trigger line
+      const triggerY = window.innerHeight * 0.35;
+      let currentSec = sectionOrder[0];
+      for (const sec of sectionOrder) {
+        const el = document.getElementById(sec.id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= triggerY) {
+            currentSec = sec;
+          }
+        }
+      }
+
+      if (navSecBadge && navSecBadge.textContent !== currentSec.label) {
+        navSecBadge.textContent = currentSec.label;
+      }
+
+      let activeLink = null;
+      navLinks.forEach(a => {
+        const isMatch = a.dataset.sec === currentSec.id;
+        a.classList.toggle('active', isMatch);
+        if (isMatch) activeLink = a;
+      });
+
+      if (navIndicator) {
+        if (activeLink) {
+          const li = activeLink.parentElement;
+          const left = li.offsetLeft;
+          const width = li.offsetWidth;
+          navIndicator.style.opacity = '1';
+          navIndicator.style.width = width + 'px';
+          navIndicator.style.transform = `translate3d(${left}px, 0, 0)`;
+        } else {
+          navIndicator.style.opacity = '0';
+        }
+      }
+    }
+
+    window.addEventListener('scroll', updateNavIndicator, { passive: true });
+    window.addEventListener('resize', updateNavIndicator);
+    updateNavIndicator();
+
+    // C. Staggered Spring "Pop-In" Reveal on Scroll
+    const popGroups = [
+      '.section-head',
+      '.bx-v2-bubbles',
+      '.bx-pill-row',
+      '.shipped-links',
+      '.skills-3-grid',
+      '.hero-logos-strip'
+    ];
+    popGroups.forEach(groupSel => {
+      document.querySelectorAll(groupSel).forEach(group => {
+        const children = Array.from(group.children);
+        children.forEach((child, idx) => {
+          child.classList.add('pop-item');
+          child.style.setProperty('--pop-delay', `${idx * 65}ms`);
+        });
+      });
+    });
+
+    const popObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('pop-in');
+        } else if (entry.boundingClientRect.top > window.innerHeight * 0.85) {
+          // Reset when scrolled back above so it pops again smoothly on next scroll down
+          entry.target.classList.remove('pop-in');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.pop-item').forEach(el => popObserver.observe(el));
+
+    // D. 60fps Animated Architectural Grid Beams & Cursor-Reactive Wireframe Nodes
+    const canvas = document.getElementById('hero-grid-canvas');
+    const heroSec = document.getElementById('hero');
+    if (canvas && heroSec) {
+      const ctx = canvas.getContext('2d');
+      const CELL = 140;
+      let cw = 0, ch = 0, dpr = 1;
+      let mouseX = -9999, mouseY = -9999;
+      let targetMX = -9999, targetMY = -9999;
+
+      function resizeCanvas() {
+        const rect = heroSec.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cw = rect.width;
+        ch = rect.height;
+        canvas.width = cw * dpr;
+        canvas.height = ch * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      heroSec.addEventListener('mousemove', e => {
+        const r = heroSec.getBoundingClientRect();
+        targetMX = e.clientX - r.left;
+        targetMY = e.clientY - r.top;
+      }, { passive: true });
+      heroSec.addEventListener('mouseleave', () => {
+        targetMX = -9999;
+        targetMY = -9999;
+      });
+
+      // Travelling light beams locked to the 140px grid (horizontal, vertical, and 45-deg diagonals)
+      const beams = [];
+      const BEAM_COUNT = 9;
+
+      function spawnBeam(randomProgress) {
+        const cols = Math.max(2, Math.ceil(cw / CELL));
+        const rows = Math.max(2, Math.ceil(ch / CELL));
+        const mode = Math.random();
+        let x, y, vx, vy;
+        const speed = 1.15 + Math.random() * 1.15;
+
+        if (mode < 0.42) {
+          // Horizontal grid line
+          y = Math.floor(Math.random() * (rows + 1)) * CELL;
+          const dir = Math.random() < 0.5 ? 1 : -1;
+          x = dir > 0 ? -80 : cw + 80;
+          if (randomProgress) x = Math.random() * cw;
+          vx = dir * speed;
+          vy = 0;
+        } else if (mode < 0.78) {
+          // Vertical grid line
+          x = Math.floor(Math.random() * (cols + 1)) * CELL;
+          const dir = Math.random() < 0.5 ? 1 : -1;
+          y = dir > 0 ? -80 : ch + 80;
+          if (randomProgress) y = Math.random() * ch;
+          vx = 0;
+          vy = dir * speed;
+        } else {
+          // 45-degree diagonal wireframe line
+          x = Math.floor(Math.random() * cols) * CELL;
+          y = 0;
+          if (randomProgress) {
+            const steps = Math.floor(Math.random() * rows) * CELL;
+            x += steps;
+            y += steps;
+          }
+          vx = speed * 0.78;
+          vy = speed * 0.78;
+        }
+
+        return {
+          x,
+          y,
+          vx,
+          vy,
+          tail: 75 + Math.random() * 55,
+          alpha: 0.45 + Math.random() * 0.4
+        };
+      }
+
+      for (let i = 0; i < BEAM_COUNT; i++) {
+        beams.push(spawnBeam(true));
+      }
+
+      let t = 0;
+      function drawGridFrame() {
+        t += 0.018;
+        ctx.clearRect(0, 0, cw, ch);
+
+        if (targetMX > -1000) {
+          mouseX += (targetMX - mouseX) * 0.14;
+          mouseY += (targetMY - mouseY) * 0.14;
+        } else {
+          mouseX = -9999;
+          mouseY = -9999;
+        }
+
+        // 1. Soft cursor spotlight on the architectural grid
+        if (mouseX > -1000) {
+          const spot = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 260);
+          spot.addColorStop(0, 'rgba(255, 107, 43, 0.13)');
+          spot.addColorStop(0.5, 'rgba(255, 107, 43, 0.04)');
+          spot.addColorStop(1, 'rgba(255, 107, 43, 0)');
+          ctx.fillStyle = spot;
+          ctx.fillRect(0, 0, cw, ch);
+        }
+
+        // 2. Breathing intersection nodes at 140px grid vertices
+        const cols = Math.ceil(cw / CELL);
+        const rows = Math.ceil(ch / CELL);
+        for (let r = 1; r < rows; r++) {
+          for (let c = 1; c < cols; c++) {
+            const gx = c * CELL;
+            const gy = r * CELL;
+            const pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + c * 1.3 + r * 1.7);
+            let nodeAlpha = 0.12 + pulse * 0.28;
+            let radius = 1.6;
+
+            if (mouseX > -1000) {
+              const dist = Math.hypot(gx - mouseX, gy - mouseY);
+              if (dist < 240) {
+                const boost = 1 - dist / 240;
+                nodeAlpha = Math.min(0.92, nodeAlpha + boost * 0.55);
+                radius = 1.6 + boost * 1.6;
+              }
+            }
+
+            ctx.beginPath();
+            ctx.arc(gx, gy, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 122, 64, ${nodeAlpha.toFixed(3)})`;
+            ctx.fill();
+          }
+        }
+
+        // 3. Travelling neon-orange light beams along grid lines
+        for (let i = 0; i < beams.length; i++) {
+          const b = beams[i];
+          b.x += b.vx;
+          b.y += b.vy;
+
+          const mag = Math.hypot(b.vx, b.vy) || 1;
+          const tx = b.x - (b.vx / mag) * b.tail;
+          const ty = b.y - (b.vy / mag) * b.tail;
+
+          const grad = ctx.createLinearGradient(tx, ty, b.x, b.y);
+          grad.addColorStop(0, 'rgba(255, 107, 43, 0)');
+          grad.addColorStop(0.7, `rgba(255, 107, 43, ${(b.alpha * 0.45).toFixed(3)})`);
+          grad.addColorStop(1, `rgba(255, 180, 140, ${b.alpha.toFixed(3)})`);
+
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+
+          // Glowing leading tip
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 200, 165, ${b.alpha.toFixed(3)})`;
+          ctx.fill();
+
+          if (b.x < -140 || b.x > cw + 140 || b.y < -140 || b.y > ch + 140) {
+            beams[i] = spawnBeam(false);
+          }
+        }
+
+        requestAnimationFrame(drawGridFrame);
+      }
+
+      requestAnimationFrame(drawGridFrame);
+    }
+  })();
+</script>
+</body>
+</html>
