@@ -2178,9 +2178,255 @@
     stroke-linecap: round;
     transition: stroke-dashoffset 0.1s linear;
   }
+
+  /* ── PORTFOLIO ENTRY LANDING ── */
+  body.landing-locked {
+    overflow: hidden;
+  }
+  .portfolio-landing {
+    --entry-x: 50vw;
+    --entry-y: 50vh;
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 48%, rgba(255, 107, 43, 0.14), transparent 38%),
+      #070809;
+    cursor: pointer;
+    isolation: isolate;
+    clip-path: inset(0);
+    transition: clip-path 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  .portfolio-landing::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      linear-gradient(to right, rgba(255, 107, 43, 0.16) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 107, 43, 0.16) 1px, transparent 1px);
+    background-size: 140px 140px;
+    mask-image: radial-gradient(circle at center, #000 15%, transparent 78%);
+    -webkit-mask-image: radial-gradient(circle at center, #000 15%, transparent 78%);
+  }
+  .portfolio-landing::after {
+    content: '';
+    position: absolute;
+    left: var(--entry-x);
+    top: var(--entry-y);
+    z-index: 4;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 70px 18px rgba(255, 107, 43, 0.5);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .portfolio-landing.is-exiting {
+    clip-path: inset(0 0 100% 0);
+  }
+  .portfolio-landing.is-exiting::after {
+    animation: landingPulse 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes landingPulse {
+    0% { opacity: 0.95; transform: translate(-50%, -50%) scale(0); }
+    55% { opacity: 0.5; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(38); }
+  }
+  .landing-topline {
+    position: absolute;
+    top: clamp(1.5rem, 4vw, 3rem);
+    left: clamp(1.5rem, 5vw, 4.5rem);
+    right: clamp(1.5rem, 5vw, 4.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .landing-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .landing-mark-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 14px var(--accent);
+  }
+  .landing-center {
+    position: relative;
+    z-index: 2;
+    width: min(92vw, 1050px);
+    text-align: center;
+  }
+  .landing-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.1rem;
+    font-family: var(--font-mono);
+    font-size: clamp(0.66rem, 1vw, 0.78rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .landing-kicker::before,
+  .landing-kicker::after {
+    content: '';
+    width: clamp(22px, 4vw, 56px);
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
+  }
+  .landing-title {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 12vw, 10rem);
+    font-weight: 700;
+    line-height: 0.82;
+    letter-spacing: -0.075em;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .landing-title span {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.48);
+  }
+  .landing-enter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: clamp(2rem, 5vh, 3.4rem);
+    padding: 0.75rem 1.15rem 0.75rem 0.78rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(17, 19, 23, 0.72);
+    backdrop-filter: blur(14px);
+    color: var(--text-sec);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    animation: landingBreathe 2.2s ease-in-out infinite;
+  }
+  .landing-enter-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #070809;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  @keyframes landingBreathe {
+    50% {
+      border-color: rgba(255, 107, 43, 0.55);
+      box-shadow: 0 0 28px rgba(255, 107, 43, 0.13);
+      transform: translateY(-3px);
+    }
+  }
+  .landing-footer {
+    position: absolute;
+    bottom: clamp(1.5rem, 4vw, 3rem);
+    left: clamp(1.5rem, 5vw, 4.5rem);
+    right: clamp(1.5rem, 5vw, 4.5rem);
+    display: flex;
+    justify-content: space-between;
+    color: #676e78;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .portfolio-landing.is-exiting .landing-center,
+  .portfolio-landing.is-exiting .landing-topline,
+  .portfolio-landing.is-exiting .landing-footer {
+    opacity: 0;
+    transform: translateY(-24px);
+    transition: opacity 0.3s ease, transform 0.45s ease;
+  }
+  @media (max-width: 600px) {
+    .landing-title { font-size: clamp(3.6rem, 20vw, 6rem); }
+    .landing-topline > span:last-child,
+    .landing-footer > span:last-child { display: none; }
+    .landing-footer { justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .portfolio-landing { transition-duration: 0.2s; }
+    .landing-enter { animation: none; }
+  }
 </style>
 </head>
-<body>
+<body class="landing-locked">
+
+<!-- FULL-SCREEN PORTFOLIO ENTRY -->
+<div class="portfolio-landing" id="portfolio-landing" role="button" tabindex="0" aria-label="Enter Sai Shreyas portfolio">
+  <div class="landing-topline">
+    <span class="landing-mark"><span class="landing-mark-dot"></span>Portfolio / 2026</span>
+    <span>New York · Builder PM</span>
+  </div>
+
+  <div class="landing-center">
+    <div class="landing-kicker">0 → 1 Builder PM</div>
+    <h1 class="landing-title">Sai <span>Shreyas</span></h1>
+    <div class="landing-enter">
+      <span class="landing-enter-icon">→</span>
+      <span>Click anywhere to enter</span>
+    </div>
+  </div>
+
+  <div class="landing-footer">
+    <span>Product · Data · AI</span>
+    <span>Scroll begins after entry</span>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const landing = document.getElementById('portfolio-landing');
+    if (!landing) return;
+
+    const enterPortfolio = (event) => {
+      if (landing.classList.contains('is-exiting')) return;
+
+      const x = event.clientX || window.innerWidth / 2;
+      const y = event.clientY || window.innerHeight / 2;
+      landing.style.setProperty('--entry-x', `${x}px`);
+      landing.style.setProperty('--entry-y', `${y}px`);
+      landing.classList.add('is-exiting');
+
+      window.setTimeout(() => {
+        landing.hidden = true;
+        document.body.classList.remove('landing-locked');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 900);
+    };
+
+    landing.addEventListener('click', enterPortfolio);
+    landing.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        enterPortfolio(event);
+      }
+    });
+  })();
+</script>
 
 <!-- AMBIENT FLOATING NEON-ORANGE AURA ORBS + SUBTLE GLOBAL GRID -->
 <div class="ambient-aura-wrap" aria-hidden="true">
