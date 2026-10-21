@@ -527,11 +527,14 @@
     justify-content: center;
   }
   .hero-portrait-stage {
+    --portrait-rx: 0deg;
+    --portrait-ry: 0deg;
     position: relative;
     width: 100%;
     max-width: 480px;
     display: flex;
     justify-content: center;
+    perspective: 760px;
   }
   .hero-portrait-stage::before {
     content: '';
@@ -547,11 +550,49 @@
     pointer-events: none;
     z-index: 0;
   }
-  .hero-portrait-img {
+  .hero-portrait-rotator {
     position: relative;
     z-index: 1;
     width: 100%;
     max-width: 450px;
+    transform-origin: 50% 62%;
+    transform: rotateY(var(--portrait-ry)) rotateX(var(--portrait-rx));
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .portrait-depth-stack {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    pointer-events: none;
+  }
+  .portrait-depth-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    filter: grayscale(1) brightness(0.2) contrast(1.25);
+    opacity: 0.9;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .portrait-depth-layer:nth-child(1) { transform: translateZ(-5px); }
+  .portrait-depth-layer:nth-child(2) { transform: translateZ(-10px); }
+  .portrait-depth-layer:nth-child(3) { transform: translateZ(-15px); }
+  .portrait-depth-layer:nth-child(4) { transform: translateZ(-20px); }
+  .portrait-depth-layer:nth-child(5) { transform: translateZ(-25px); }
+  .portrait-depth-layer:nth-child(6) {
+    transform: translateZ(-30px);
+    filter: grayscale(1) brightness(0.13) contrast(1.35) drop-shadow(0 22px 34px rgba(0, 0, 0, 0.62));
+  }
+  .hero-portrait-img {
+    position: relative;
+    z-index: 2;
+    width: 100%;
     height: auto;
     display: block;
     /* Transparent PNG sits directly on the page background with zero solid box */
@@ -559,6 +600,8 @@
     image-rendering: -webkit-optimize-contrast;
     user-select: none;
     pointer-events: none;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* Floating 3D Glass Orbs */
@@ -2568,21 +2611,17 @@
           </div>
 
           <!-- Transparent PNG Cutout -->
-          <img src="profile-cutout.png?v=21" alt="Sai Shreyas Vyamajala" class="hero-portrait-img">
-
-          <a href="#projects" class="hero-stamp-badge" title="Explore Case Studies" style="text-decoration:none;cursor:pointer;">
-            <svg class="hero-stamp-ring" viewBox="0 0 120 120">
-              <defs><path id="stampCircle" d="M 60, 60 m -44, 0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0"/></defs>
-              <text><textPath href="#stampCircle">PRODUCT MANAGER • BUILDER PM • NYU MOT • </textPath></text>
-            </svg>
-            <div class="hero-stamp-center">
-              <!-- Builder PM / AI Product North-Star Emblem -->
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L14.6 9.4L22 12L14.6 14.6L12 22L9.4 14.6L2 12L9.4 9.4L12 2Z"/>
-                <circle cx="19" cy="5" r="1.6"/>
-              </svg>
+          <div class="hero-portrait-rotator">
+            <div class="portrait-depth-stack" aria-hidden="true">
+              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
+              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
+              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
+              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
+              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
+              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
             </div>
-          </a>
+            <img src="profile-cutout.png?v=21" alt="Sai Shreyas Vyamajala" class="hero-portrait-img">
+          </div>
         </div>
       </div>
     </div>
@@ -3402,7 +3441,63 @@
     });
   });
 
-  // ── 3. LIVE SCROLL-DRIVEN CARD SCALE UP / SCALE DOWN + 3D CURSOR TILT & SPOTLIGHT ENGINE ──
+  // ── 3. HERO PORTRAIT: SMOOTH PHOTO-ONLY ROTATION ──
+  (function initHeroPortrait3D() {
+    const stage = document.querySelector('.hero-portrait-stage');
+    if (!stage || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const current = { rx: 0, ry: 0 };
+    const target = { ...current };
+    let interacting = false;
+    let inView = true;
+
+    const setPointerTarget = (event) => {
+      if (event.pointerType === 'touch') return;
+      const rect = stage.getBoundingClientRect();
+      const nx = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
+      const ny = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
+
+      target.ry = nx * 28;
+      target.rx = -ny * 4;
+    };
+
+    stage.addEventListener('pointerenter', event => {
+      if (event.pointerType === 'touch') return;
+      interacting = true;
+      setPointerTarget(event);
+    });
+    stage.addEventListener('pointermove', setPointerTarget);
+    stage.addEventListener('pointerleave', () => {
+      interacting = false;
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        inView = entries[0]?.isIntersecting ?? true;
+      }, { threshold: 0.05 }).observe(stage);
+    }
+
+    const render = time => {
+      if (inView) {
+        if (!interacting) {
+          target.ry = Math.sin(time * 0.0009) * 8;
+          target.rx = Math.cos(time * 0.00075) * 0.8;
+        }
+
+        Object.keys(current).forEach(key => {
+          current[key] += (target[key] - current[key]) * 0.085;
+        });
+
+        stage.style.setProperty('--portrait-rx', `${current.rx.toFixed(2)}deg`);
+        stage.style.setProperty('--portrait-ry', `${current.ry.toFixed(2)}deg`);
+      }
+      requestAnimationFrame(render);
+    };
+
+    requestAnimationFrame(render);
+  })();
+
+  // ── 4. LIVE SCROLL-DRIVEN CARD SCALE UP / SCALE DOWN + 3D CURSOR TILT & SPOTLIGHT ENGINE ──
   (function initScrollAndTiltPhysics() {
     const selectors = [
       '.bx-card',
@@ -3502,7 +3597,7 @@
     requestAnimationFrame(computeTargets);
   })();
 
-  // ── 4. INTERACTIVE "FROM CONCEPT TO COMPLETION" FLOWCHART <-> 2X2 GRID SYNC ──
+  // ── 5. INTERACTIVE "FROM CONCEPT TO COMPLETION" FLOWCHART <-> 2X2 GRID SYNC ──
   (function initConceptCompletionFlow() {
     const pills = Array.from(document.querySelectorAll('.cc-pill-node[data-cc-step]'));
     const steps = Array.from(document.querySelectorAll('.cc-step-item[data-cc-step]'));
