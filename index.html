@@ -499,23 +499,24 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    flex-wrap: wrap;
-    opacity: 0.68;
-    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 88%, transparent 100%);
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 88%, transparent 100%);
+    flex-wrap: nowrap;
   }
   .hero-logo-item {
     display: inline-flex;
     align-items: center;
     gap: 0.42rem;
+    flex: 0 0 auto;
+    white-space: nowrap;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 0.82rem;
-    color: var(--text-sec);
+    color: #dfe3ea;
   }
   .hero-logo-item svg {
     width: 17px;
     height: 17px;
+    color: #fff;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
   }
 
   /* Hero Right: True Transparent Cutout Portrait + Floating Glass Orbs */
@@ -2928,8 +2929,8 @@
             <div class="ps-lbl">Countries</div>
           </div>
           <div class="ps-card">
-            <div class="ps-val" data-prefix="$" data-count="18" data-suffix="K">$18K</div>
-            <div class="ps-lbl">NYU Scholarship</div>
+            <div class="ps-val">0 → 1</div>
+            <div class="ps-lbl">Builder PM</div>
           </div>
         </div>
 
