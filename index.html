@@ -527,14 +527,11 @@
     justify-content: center;
   }
   .hero-portrait-stage {
-    --portrait-rx: 0deg;
-    --portrait-ry: 0deg;
     position: relative;
     width: 100%;
     max-width: 480px;
     display: flex;
     justify-content: center;
-    perspective: 760px;
   }
   .hero-portrait-stage::before {
     content: '';
@@ -550,58 +547,41 @@
     pointer-events: none;
     z-index: 0;
   }
-  .hero-portrait-rotator {
+  .hero-portrait-turntable {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 450px;
-    transform-origin: 50% 62%;
-    transform: rotateY(var(--portrait-ry)) rotateX(var(--portrait-rx));
-    transform-style: preserve-3d;
-    will-change: transform;
+    max-width: 480px;
+    height: clamp(510px, 58vw, 640px);
+    filter: drop-shadow(0 22px 38px rgba(0, 0, 0, 0.58));
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    outline: none;
   }
-  .portrait-depth-stack {
+  .hero-portrait-turntable:active {
+    cursor: grabbing;
+  }
+  .portrait-turntable-frame {
+    --frame-flip: 1;
     position: absolute;
     inset: 0;
-    transform-style: preserve-3d;
-    pointer-events: none;
-  }
-  .portrait-depth-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    opacity: 0;
+    transform: scaleX(var(--frame-flip));
     pointer-events: none;
     user-select: none;
-    filter: grayscale(1) brightness(0.2) contrast(1.25);
-    opacity: 0.9;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+    -webkit-user-drag: none;
+    will-change: opacity;
   }
-  .portrait-depth-layer:nth-child(1) { transform: translateZ(-5px); }
-  .portrait-depth-layer:nth-child(2) { transform: translateZ(-10px); }
-  .portrait-depth-layer:nth-child(3) { transform: translateZ(-15px); }
-  .portrait-depth-layer:nth-child(4) { transform: translateZ(-20px); }
-  .portrait-depth-layer:nth-child(5) { transform: translateZ(-25px); }
-  .portrait-depth-layer:nth-child(6) {
-    transform: translateZ(-30px);
-    filter: grayscale(1) brightness(0.13) contrast(1.35) drop-shadow(0 22px 34px rgba(0, 0, 0, 0.62));
+  .portrait-turntable-frame:first-child {
+    opacity: 1;
   }
-  .hero-portrait-img {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: auto;
-    display: block;
-    /* Transparent PNG sits directly on the page background with zero solid box */
-    filter: contrast(1.04) brightness(1.04) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65));
-    image-rendering: -webkit-optimize-contrast;
-    user-select: none;
-    pointer-events: none;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+  .portrait-turntable-frame.is-mirrored {
+    --frame-flip: -1;
   }
 
   /* Floating 3D Glass Orbs */
@@ -1957,6 +1937,7 @@
     .nav-links { display: none; }
     .boldex-counters, .skills-3-grid { grid-template-columns: 1fr; }
     .tl-v-row { grid-template-columns: 1fr; gap: 0.35rem; }
+    .hero-portrait-turntable { height: 540px; }
   }
 
   /* ── MODERN SPRING "POP" ANIMATIONS & INTERACTIVE POLISH ── */
@@ -2242,6 +2223,7 @@
     isolation: isolate;
     clip-path: inset(0);
     transition: clip-path 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+    animation: landingAmbient 4.8s ease-in-out infinite alternate;
   }
   .portfolio-landing::before {
     content: '';
@@ -2254,6 +2236,7 @@
     background-size: 140px 140px;
     mask-image: radial-gradient(circle at center, #000 15%, transparent 78%);
     -webkit-mask-image: radial-gradient(circle at center, #000 15%, transparent 78%);
+    animation: landingGridDrift 12s ease-in-out infinite alternate;
   }
   .portfolio-landing::after {
     content: '';
@@ -2281,6 +2264,90 @@
     55% { opacity: 0.5; }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(38); }
   }
+  @keyframes landingAmbient {
+    from { box-shadow: inset 0 0 110px rgba(255, 107, 43, 0.015); }
+    to { box-shadow: inset 0 0 180px rgba(255, 107, 43, 0.075); }
+  }
+  @keyframes landingGridDrift {
+    from { transform: translate3d(-1.2%, -1%, 0) scale(1.035); opacity: 0.65; }
+    to { transform: translate3d(1.2%, 1%, 0) scale(1.07); opacity: 1; }
+  }
+  @keyframes landingFadeDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes landingFadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes landingTitleIn {
+    from {
+      opacity: 0;
+      transform: translateY(54px) scale(0.94);
+      filter: blur(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+  @keyframes landingTitleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+  }
+  @keyframes landingNameFromLeft {
+    0% {
+      opacity: 0;
+      transform: translate3d(-48vw, 18px, 0) rotate(-7deg);
+      filter: blur(7px);
+    }
+    72% {
+      opacity: 1;
+      transform: translate3d(14px, 0, 0) rotate(0.8deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0);
+      filter: blur(0);
+    }
+  }
+  @keyframes landingNameFromRight {
+    0% {
+      opacity: 0;
+      transform: translate3d(48vw, -18px, 0) rotate(7deg);
+      filter: blur(7px);
+    }
+    72% {
+      opacity: 1;
+      transform: translate3d(-14px, 0, 0) rotate(-0.8deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0);
+      filter: blur(0);
+    }
+  }
+  @keyframes landingOutlineGlow {
+    0%, 100% {
+      -webkit-text-stroke-color: rgba(255, 255, 255, 0.38);
+      filter: drop-shadow(0 0 0 rgba(255, 107, 43, 0));
+    }
+    50% {
+      -webkit-text-stroke-color: rgba(255, 255, 255, 0.68);
+      filter: drop-shadow(0 0 18px rgba(255, 107, 43, 0.18));
+    }
+  }
+  @keyframes landingLineReveal {
+    from { transform: scaleX(0); opacity: 0; }
+    to { transform: scaleX(1); opacity: 0.55; }
+  }
+  @keyframes landingDotPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 10px var(--accent); }
+    50% { transform: scale(1.35); box-shadow: 0 0 22px var(--accent); }
+  }
   .landing-topline {
     position: absolute;
     top: clamp(1.5rem, 4vw, 3rem);
@@ -2294,6 +2361,7 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
+    animation: landingFadeDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
   }
   .landing-mark {
     display: inline-flex;
@@ -2308,6 +2376,7 @@
     border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 14px var(--accent);
+    animation: landingDotPulse 1.8s ease-in-out 0.8s infinite;
   }
   .landing-center {
     position: relative;
@@ -2327,6 +2396,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--accent);
+    animation: landingFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
   }
   .landing-kicker::before,
   .landing-kicker::after {
@@ -2335,6 +2405,8 @@
     height: 1px;
     background: currentColor;
     opacity: 0.55;
+    transform-origin: center;
+    animation: landingLineReveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
   }
   .landing-title {
     font-family: var(--font-display);
@@ -2344,11 +2416,23 @@
     letter-spacing: -0.075em;
     color: var(--text);
     text-transform: uppercase;
+    animation: landingTitleFloat 4.6s ease-in-out 1.5s infinite;
   }
-  .landing-title span {
+  .landing-title-first,
+  .landing-title-last {
     display: block;
+    will-change: transform, opacity, filter;
+  }
+  .landing-title-first {
+    color: var(--text);
+    animation: landingNameFromLeft 1.05s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
+  .landing-title-last {
     color: transparent;
     -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.48);
+    animation:
+      landingNameFromRight 1.05s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both,
+      landingOutlineGlow 3.2s ease-in-out 1.55s infinite;
   }
   .landing-enter {
     display: inline-flex;
@@ -2365,7 +2449,9 @@
     font-size: 0.68rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    animation: landingBreathe 2.2s ease-in-out infinite;
+    animation:
+      landingFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both,
+      landingBreathe 2.2s ease-in-out 1.45s infinite;
   }
   .landing-enter-icon {
     display: grid;
@@ -2398,10 +2484,12 @@
     font-size: 0.64rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    animation: landingFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
   }
   .portfolio-landing.is-exiting .landing-center,
   .portfolio-landing.is-exiting .landing-topline,
   .portfolio-landing.is-exiting .landing-footer {
+    animation: none;
     opacity: 0;
     transform: translateY(-24px);
     transition: opacity 0.3s ease, transform 0.45s ease;
@@ -2414,7 +2502,19 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .portfolio-landing { transition-duration: 0.2s; }
-    .landing-enter { animation: none; }
+    .portfolio-landing,
+    .portfolio-landing::before,
+    .landing-topline,
+    .landing-mark-dot,
+    .landing-kicker,
+    .landing-kicker::before,
+    .landing-kicker::after,
+    .landing-title,
+    .landing-title span,
+    .landing-enter,
+    .landing-footer {
+      animation: none;
+    }
   }
 </style>
 </head>
@@ -2429,7 +2529,10 @@
 
   <div class="landing-center">
     <div class="landing-kicker">0 → 1 Builder PM</div>
-    <h1 class="landing-title">Sai <span>Shreyas</span></h1>
+    <h1 class="landing-title">
+      <span class="landing-title-first">Sai</span>
+      <span class="landing-title-last">Shreyas</span>
+    </h1>
     <div class="landing-enter">
       <span class="landing-enter-icon">→</span>
       <span>Click anywhere to enter</span>
@@ -2623,17 +2726,22 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
           </div>
 
-          <!-- Transparent PNG Cutout -->
-          <div class="hero-portrait-rotator">
-            <div class="portrait-depth-stack" aria-hidden="true">
-              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
-              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
-              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
-              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
-              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
-              <img src="profile-cutout.png?v=21" alt="" class="portrait-depth-layer">
-            </div>
-            <img src="profile-cutout.png?v=21" alt="Sai Shreyas Vyamajala" class="hero-portrait-img">
+          <!-- Eight-view interactive portrait turntable -->
+          <div
+            class="hero-portrait-turntable"
+            id="hero-portrait-turntable"
+            role="img"
+            aria-label="Interactive rotating portrait of Sai Shreyas Vyamajala"
+            tabindex="0"
+          >
+            <img src="profile-cutout.png?v=21" alt="" class="portrait-turntable-frame" data-angle="0" draggable="false">
+            <img src="profile-quarter-front-approx.png" alt="" class="portrait-turntable-frame" data-angle="45" draggable="false">
+            <img src="profile-side-approx.png" alt="" class="portrait-turntable-frame" data-angle="90" draggable="false">
+            <img src="profile-quarter-back-approx.png" alt="" class="portrait-turntable-frame" data-angle="135" draggable="false">
+            <img src="profile-back-approx.png" alt="" class="portrait-turntable-frame" data-angle="180" draggable="false">
+            <img src="profile-quarter-back-approx.png" alt="" class="portrait-turntable-frame is-mirrored" data-angle="225" draggable="false">
+            <img src="profile-side-approx.png" alt="" class="portrait-turntable-frame is-mirrored" data-angle="270" draggable="false">
+            <img src="profile-quarter-front-approx.png" alt="" class="portrait-turntable-frame is-mirrored" data-angle="315" draggable="false">
           </div>
         </div>
       </div>
@@ -3380,6 +3488,91 @@
 </div>
 
 <script>
+  (() => {
+    const turntable = document.getElementById('hero-portrait-turntable');
+    const frames = turntable
+      ? Array.from(turntable.querySelectorAll('.portrait-turntable-frame'))
+      : [];
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!turntable || !frames.length) return;
+
+    let currentAngle = 0;
+    let targetAngle = 0;
+    let dragStartX = 0;
+    let dragStartAngle = 0;
+    let userInteracting = false;
+    let resumeAt = 0;
+    let inView = true;
+
+    const renderFrames = angle => {
+      const normalized = ((angle % 360) + 360) % 360;
+      const position = normalized / 45;
+      const firstIndex = Math.floor(position) % frames.length;
+      const secondIndex = (firstIndex + 1) % frames.length;
+      const rawMix = position - Math.floor(position);
+      const mix = rawMix * rawMix * (3 - 2 * rawMix);
+
+      frames.forEach((frame, index) => {
+        if (index === firstIndex) {
+          frame.style.opacity = (1 - mix).toFixed(3);
+          frame.style.zIndex = mix < 0.5 ? '2' : '1';
+        } else if (index === secondIndex) {
+          frame.style.opacity = mix.toFixed(3);
+          frame.style.zIndex = mix >= 0.5 ? '2' : '1';
+        } else {
+          frame.style.opacity = '0';
+          frame.style.zIndex = '0';
+        }
+      });
+    };
+
+    turntable.addEventListener('pointerdown', event => {
+      userInteracting = true;
+      dragStartX = event.clientX;
+      dragStartAngle = targetAngle;
+      turntable.setPointerCapture(event.pointerId);
+    });
+    turntable.addEventListener('pointermove', event => {
+      if (!userInteracting) return;
+      targetAngle = dragStartAngle + (event.clientX - dragStartX) * 0.48;
+    });
+    turntable.addEventListener('pointerup', event => {
+      userInteracting = false;
+      turntable.releasePointerCapture(event.pointerId);
+      resumeAt = performance.now() + 2200;
+    });
+    turntable.addEventListener('pointercancel', () => {
+      userInteracting = false;
+      resumeAt = performance.now() + 2200;
+    });
+    turntable.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      targetAngle += event.key === 'ArrowRight' ? 45 : -45;
+      resumeAt = performance.now() + 2600;
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        inView = entries[0]?.isIntersecting ?? true;
+      }, { threshold: 0.05 }).observe(turntable);
+    }
+
+    const animatePortrait = time => {
+      if (inView) {
+        if (!reducedMotion && !userInteracting && time >= resumeAt) {
+          const nearestFront = Math.round(targetAngle / 360) * 360;
+          targetAngle = nearestFront + Math.sin(time * 0.0004) * 8;
+        }
+        currentAngle += (targetAngle - currentAngle) * 0.13;
+        renderFrames(currentAngle);
+      }
+      requestAnimationFrame(animatePortrait);
+    };
+    renderFrames(0);
+    requestAnimationFrame(animatePortrait);
+  })();
+
   function toggleFaq(btn) {
     const item = btn.closest('.faq-item');
     const answer = item.querySelector('.faq-a');
@@ -3454,63 +3647,7 @@
     });
   });
 
-  // ── 3. HERO PORTRAIT: SMOOTH PHOTO-ONLY ROTATION ──
-  (function initHeroPortrait3D() {
-    const stage = document.querySelector('.hero-portrait-stage');
-    if (!stage || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const current = { rx: 0, ry: 0 };
-    const target = { ...current };
-    let interacting = false;
-    let inView = true;
-
-    const setPointerTarget = (event) => {
-      if (event.pointerType === 'touch') return;
-      const rect = stage.getBoundingClientRect();
-      const nx = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
-      const ny = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
-
-      target.ry = nx * 28;
-      target.rx = -ny * 4;
-    };
-
-    stage.addEventListener('pointerenter', event => {
-      if (event.pointerType === 'touch') return;
-      interacting = true;
-      setPointerTarget(event);
-    });
-    stage.addEventListener('pointermove', setPointerTarget);
-    stage.addEventListener('pointerleave', () => {
-      interacting = false;
-    });
-
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(entries => {
-        inView = entries[0]?.isIntersecting ?? true;
-      }, { threshold: 0.05 }).observe(stage);
-    }
-
-    const render = time => {
-      if (inView) {
-        if (!interacting) {
-          target.ry = Math.sin(time * 0.0009) * 8;
-          target.rx = Math.cos(time * 0.00075) * 0.8;
-        }
-
-        Object.keys(current).forEach(key => {
-          current[key] += (target[key] - current[key]) * 0.085;
-        });
-
-        stage.style.setProperty('--portrait-rx', `${current.rx.toFixed(2)}deg`);
-        stage.style.setProperty('--portrait-ry', `${current.ry.toFixed(2)}deg`);
-      }
-      requestAnimationFrame(render);
-    };
-
-    requestAnimationFrame(render);
-  })();
-
-  // ── 4. LIVE SCROLL-DRIVEN CARD SCALE UP / SCALE DOWN + 3D CURSOR TILT & SPOTLIGHT ENGINE ──
+  // ── 3. LIVE SCROLL-DRIVEN CARD SCALE UP / SCALE DOWN + 3D CURSOR TILT & SPOTLIGHT ENGINE ──
   (function initScrollAndTiltPhysics() {
     const selectors = [
       '.bx-card',
